@@ -1,0 +1,21 @@
+# build output
+build/
+manager/build/
+*.obj
+*.pdb
+*.exp
+*.lib
+__pycache__/
+out/
+*.dec
+dist/*.zip
+dist/mods/
+dist/mods.json
+
+# made on the modder's machine from their own copy of the game (game art: never commit)
+mod/
+tools/python/
+tools/game.txt
+tools/scan.json
+*.osb
+dist/RELEASE-NOTES*.md
