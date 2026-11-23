@@ -75,6 +75,8 @@ To remove everything, delete `winmm.dll`, `DMFD Mod Manager.exe`, `mods.json` an
 
 The background art is the game's own, read by the Manager from your Steam library.
 
+![The in-game mod menu (Insert) over the title screen, showing Rebalance's per-class damage settings](docs/images/ingame-menu.webp)
+
 ## Report a problem
 
 1. Close the game, then open **DMFD Mod Manager.exe** → **Log** → **Report a problem**. It makes one
