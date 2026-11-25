@@ -4,7 +4,7 @@ An unofficial, fan-made mod kit for **Dragon Marked for Death** (Steam, Windows)
 loader, a Mod Manager, a few mods, and the tools to make your own, all without changing any of
 the game's own files.
 
-> **Work in progress: version 0.9 is a pre-release.** It's shared early so others can try it,
+> **Work in progress: version 0.10 is a pre-release.** It's shared early so others can try it,
 > check it and build on it, and things will break or change. Back up your saves (the Mod Manager
 > does this for you before each launch), and please [report problems](#report-a-problem).
 
@@ -40,7 +40,7 @@ later).
 
 ## Install
 
-**Download** `DMFD-ModKit-0.9.zip` from the [Releases page](https://github.com/Scootermouse/dmfd-modkit/releases)
+**Download** `DMFD-ModKit-0.10.zip` from the [Releases page](https://github.com/Scootermouse/dmfd-modkit/releases)
 (under "Assets"). It's a pre-release: expect rough edges.
 
 1. In Steam, right-click **Dragon Marked For Death** → **Manage** → **Browse local files**. A

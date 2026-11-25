@@ -2,7 +2,7 @@
 #include <windows.h>
 #include <cstdint>
 
-#define CONTENT_VERSION "0.9"
+#define CONTENT_VERSION "0.10"
 
 void Log(const char* fmt, ...);
 // Hooks are installed one at a time across the loader and every mod (a named mutex per game

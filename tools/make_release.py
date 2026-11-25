@@ -27,6 +27,8 @@ import zipfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CODE_MODS = ["Rebalance", "QuickSpells", "SkipQuit", "HolyUp"]
+# code mods for modders: their own zips on the mod list, not in the player kit
+EXTRA_MODS = ["EffectTweaks"]
 # where a release's files are downloaded from (GitHub: the files attached to release v<version>)
 RELEASE_URL = "https://github.com/Scootermouse/dmfd-modkit/releases/download/v%s/"
 
@@ -57,7 +59,16 @@ def main(packages):
         sys.exit("missing (build it first): " + ", ".join(missing))
     if os.path.isfile(os.path.join(ROOT, "tools", "python", "python.exe")):
         tools_zip()  # first: the mod list names it
-    mod_zips(files)  # writes dist/mods.json
+    extra = {}
+    for name in EXTRA_MODS:
+        extra["mods/%s/%s.dll" % (name, name)] = os.path.join(ROOT, "build", "mods", name, name + ".dll")
+        extra["mods/%s/mod.ini" % name] = os.path.join(ROOT, "codemods", name, "mod.ini")
+        extra["mods/%s/effects.txt" % name] = os.path.join(ROOT, "codemods", name, "effects.txt")
+    extra = {a: s for a, s in extra.items() if os.path.isfile(s) or not a.endswith(".txt")}
+    missing = [s for s in extra.values() if not os.path.isfile(s)]
+    if missing:
+        sys.exit("missing (build it first): " + ", ".join(missing))
+    mod_zips({**files, **extra})  # writes dist/mods.json
     files["mods.json"] = os.path.join(ROOT, "dist", "mods.json")
     readme = open(os.path.join(ROOT, "dist", "README-kit.txt"), encoding="utf-8").read().replace("{version}", ver)
     out = os.path.join(ROOT, "dist", "DMFD-ModKit-%s.zip" % ver)
@@ -113,6 +124,7 @@ LISTING = {
     "QuickSpells": {"tags": ["gameplay", "quality of life"]},
     "SkipQuit": {"tags": ["quality of life"]},
     "HolyUp": {"tags": ["gameplay", "classes"]},
+    "EffectTweaks": {"tags": ["modding tools"]},
 }
 
 

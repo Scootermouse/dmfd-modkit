@@ -17,7 +17,7 @@ namespace DmfdManager
 {
     partial class MainWindow : Window
     {
-        public const string Version = "0.9";
+        public const string Version = "0.10";
         readonly Grid root = new Grid();
         readonly StackPanel nav = new StackPanel();
         readonly ScrollViewer scroll = new ScrollViewer { VerticalScrollBarVisibility = ScrollBarVisibility.Auto };
