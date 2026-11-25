@@ -44,7 +44,7 @@ struct Site { uint32_t va; int opLen; const char* op; uint32_t table; };
 static const uint32_t BODY_TABLE = 0x1112F90, PAL_TABLE = 0x111A15C;
 static const int NTAB = sizeof CLASS_TABLES / sizeof CLASS_TABLES[0];
 static const uint32_t SPRITE_CMP = 0xD79D91, SPRITE_WRAP_CMP = 0xD79E73;  // cmp esi,5 / cmp edi,5
-static const uint32_t SETUP_CHECK = 0xC928B0;  // setup-block validator: cmp byte [ecx],5 (class), then colour/voice <= 7, level 1..100
+static const uint32_t SETUP_CHECK = 0xC928B0;  // setup-block validator: cmp byte [ecx],5 (class), then color/voice <= 7, level 1..100
 static const uint32_t INFO_BUILD = 0xD86F60;  // builds the player-info package (see h_info)
 static const uint32_t SAVE_LOAD = 0x8EB310;   // thiscall(obj, decrypted file buffer), ret 4; save = [[obj+0x1C]+4]
 static const uint32_t CLASS_RECORD = 0xC8F4B0;  // a class's record in the current contract (see h_record)
@@ -398,8 +398,8 @@ static void ReadSidecarOnce()
 
 // Put the right class's bytes into each slot of one contract, for the current page.
 // An extra class's first time in a contract: it starts as a brand-new character (level 1, the
-// starting gear and default colour of its slot's class), never as a copy of the player's own
-// character, and not yet created: the select screen shows NEW and runs the game's own colour,
+// starting gear and default color of its slot's class), never as a copy of the player's own
+// character, and not yet created: the select screen shows NEW and runs the game's own color,
 // voice and name screens. The slot's "created" bit (section A byte 2, a bit per slot) follows
 // the class in the slot; the base class's own bit comes back with its bytes.
 static void FreshExtra(int cls, int c, int k, const Slot& s, uint8_t* out)
@@ -765,9 +765,9 @@ static void __cdecl LogBind(int asked, int drawn, uintptr_t from)
     Log("bind class %d -> %d from %p (page %d)", asked, drawn, (void*)(from - (uintptr_t)Game(0)), g_page);
 }
 
-static void __cdecl LogBindFull(int asked, int drawn, uintptr_t from, int colour, int element)
+static void __cdecl LogBindFull(int asked, int drawn, uintptr_t from, int color, int element)
 {
-    Log("bind class %d -> %d colour %d element %d from %p (page %d)", asked, drawn, colour, element,
+    Log("bind class %d -> %d color %d element %d from %p (page %d)", asked, drawn, color, element,
         (void*)(from - (uintptr_t)Game(0)), g_page);
 }
 __declspec(naked) static void h_palBind()
@@ -798,7 +798,7 @@ __declspec(naked) static void h_palBind()
         je go
         pushad
         push dword ptr [esp + 44]      // element
-        push dword ptr [esp + 44]      // colour
+        push dword ptr [esp + 44]      // color
         push dword ptr [esp + 44]      // return address
         push edx
         push eax
@@ -852,7 +852,7 @@ __declspec(naked) static void h_bodyNames()
     }
 }
 
-// 0xAF6210 (thiscall(picture, class, weapon, ?, colour, element, weapon 2, scale), ret 0x1C)
+// 0xAF6210 (thiscall(picture, class, weapon, ?, color, element, weapon 2, scale), ret 0x1C)
 // draws a character picture (inn and bar status panels, the title select preview). It keeps
 // the class it last built at picture+0xC0 and rebuilds the body only when the class number
 // changes; the palette (0xD66C80) is bound every time. The inn's status panel passes a slot,
@@ -1041,9 +1041,9 @@ static void PatchOracleTests()
 // The COLOR change (0xAB8140) has the same inlined lookup for the HUD's class (+0x56C):
 // 0xAB819B jb, the >= 6 branch at 0xAB819D leaves the record's offset from the save
 // (edx) in ecx and goes on at 0xAB81C5.
-static const uint32_t COLOUR_REC = 0xAB819D, COLOUR_REC_DONE = 0xAB81C5;
-static uintptr_t g_colourRecDone;
-__declspec(naked) static void h_colourRecord()
+static const uint32_t COLOR_REC = 0xAB819D, COLOR_REC_DONE = 0xAB81C5;
+static uintptr_t g_colorRecDone;
+__declspec(naked) static void h_colorRecord()
 {
     __asm {
         push edx
@@ -1055,13 +1055,13 @@ __declspec(naked) static void h_colourRecord()
         jz keep
         sub eax, edx
         mov ecx, eax
-        jmp g_colourRecDone
+        jmp g_colorRecDone
     keep:
         movzx eax, byte ptr [edx + 0x40]
         imul eax, dword ptr [edx + 0x34]
         add eax, dword ptr [edx + 0x38]
         mov ecx, dword ptr [eax + edx + 4]
-        jmp g_colourRecDone
+        jmp g_colorRecDone
     }
 }
 
@@ -1210,7 +1210,7 @@ __declspec(naked) static void h_baseStatClass()  // replaces mov eax,[esi+0xA4] 
 
 // The Warrior's greatsword body: 0xD79D80 swaps to pl1_cb01.osb when "class == 1 and
 // the weapon is that kind" (ebx = 1), at 0xD79E07 (cmp esi,1 / jne / cmp ebx,esi / jne).
-// A Warrior-based class gets it too (palettes go by class, so its own colours apply).
+// A Warrior-based class gets it too (palettes go by class, so its own colors apply).
 static const uint32_t WARRIOR_BODY = 0xD79E07;
 static uintptr_t g_warriorYes, g_warriorNo;
 static int g_warriorBase;
@@ -1496,7 +1496,7 @@ static void __fastcall h_palLoad(void* loader, uint8_t* block)
 // Page art (built by tools/selectart.py into s_o0a00): the panel layout is the
 // animation キャラクターセレクト2, set on a screen object with 0xE4EA70
 // (thiscall(obj, name hash, ptr, flag, float), ret 0x10); each page with art has
-// a copy MOD_SEL_PAGE<p>. The selected panel's coloured picture is an animation
+// a copy MOD_SEL_PAGE<p>. The selected panel's colored picture is an animation
 // per panel, whose name hashes the HUD caches in six words at 0x28EB3A8; an extra
 // class with art has MOD_SEL_<class>.
 static const uint32_t SET_ANIM = 0xE4EA70, HIGHLIGHT_CACHE = 0x28EB3A8;
@@ -1598,14 +1598,14 @@ static bool PageHighlights()
 // those two. Prompts: 0xA92060 (ecx = the screen's text container (screen+0x3F8),
 // edx = list of {text part, text part, PadInfo.tb2 label}, stack: count, prompt
 // layout, "PadInfo.tb2", spacing, 0, 0, 0; caller cleans) makes a text per entry at
-// its part; the screen then gives each text colour 1 (0xCCD580) and priority 0x1E.
+// its part; the screen then gives each text color 1 (0xCCD580) and priority 0x1E.
 // Icons: a com_butt.osb sprite (0xE093C0, priority 0xE4E6A0) playing a button
 // animation (its name hash in a global; ZRボタン = RT), pinned to a layout part by
 // pointing its +0x44 at the part's transform. Build mod adds the parts
 // button3 / button_text3 and the labels MOD_PAGE_<n>.
 static const uint32_t PROMPTS = 0xA92060, PROMPTS_FROM_SELECT = 0xABD73F;
 static const uint32_t MAKE_SPRITE = 0xE093C0, SPRITE_PRIORITY = 0xE4E6A0, MAP_FIND = 0x7B2870;
-static const uint32_t MAP_FIND_ADD = 0x9E00C0, TEXT_COLOUR = 0xCCD580, BUTTON_RT = 0x28A0608;
+static const uint32_t MAP_FIND_ADD = 0x9E00C0, TEXT_COLOR = 0xCCD580, BUTTON_RT = 0x28A0608;
 struct PromptEntry {
     uint32_t part, part2;
     const char* label;
@@ -1644,8 +1644,8 @@ static void StylePageText(void* self)
     ((void**(__thiscall*)(void*, void**, uint32_t*))Game(MAP_FIND_ADD))(self, &it, &key);
     void* text = *(void**)((uint8_t*)it + 0x14);
     void** vt = *(void***)text;
-    void* colour = ((void*(__fastcall*)(int))Game(TEXT_COLOUR))(1);
-    ((void(__thiscall*)(void*, void*))vt[0x1C / 4])(text, colour);
+    void* color = ((void*(__fastcall*)(int))Game(TEXT_COLOR))(1);
+    ((void(__thiscall*)(void*, void*))vt[0x1C / 4])(text, color);
     ((void(__thiscall*)(void*, int))vt[0x28 / 4])(text, 0x1E);
 }
 
@@ -1832,7 +1832,7 @@ static bool PageMask(uint8_t* sel)
 }
 
 // After moving the cursor ourselves, update the screen as its own cursor move does
-// (0xDAA6F8): preview (0xAB8740) and COLOR icon (0xAB8140, the panel's colour at
+// (0xDAA6F8): preview (0xAB8740) and COLOR icon (0xAB8140, the panel's color at
 // +0x3F0 + 4*panel) on the HUD at +0x594, then 0xDAB390.
 static void CursorMoved(uint8_t* sel)
 {
@@ -1928,7 +1928,7 @@ static uint8_t __fastcall h_step(void* self, void* edx, void* ctx, void* stack)
             ApplyPageAll(mem);
             int cur = mem[0x40] < NCON ? mem[0x40] : 0;
             for (int k = 0; k < 6; k++) g_bindMap[k] = g_slot[cur][k].nr ? g_slot[cur][k].occupant : k;
-            // each panel's COLOR (+0x3F0 + 4*panel) is the colour of the class now in it
+            // each panel's COLOR (+0x3F0 + 4*panel) is the color of the class now in it
             // (setup block byte 1); the screen filled them for the classes it opened with
             for (int k = 0; k < 6; k++) {
                 if (!g_slot[cur][k].nr) continue;
@@ -2081,7 +2081,7 @@ static const uint32_t PORTRAIT = 0xCCCD80, INN_PORTRAIT_RET = 0xAD8A0E;
 static const char* g_name[MAX_CLASSES];
 static int g_portrait[MAX_CLASSES];  // 1 small, 2 large, 3 both
 static bool g_barFace[MAX_CLASSES];  // has its own bar party menu face (MOD_PlFace_<class>)
-// Build mod made the "empty" pictures (MOD_EMPTY_*: the game's grey "no element" dash):
+// Build mod made the "empty" pictures (MOD_EMPTY_*: the game's gray "no element" dash):
 // shown for a class with no picture of its own for a spot, and for empty slots.
 static bool g_hasEmpty;
 
@@ -2577,7 +2577,7 @@ bool ClassesInit()
         }
         if (c >= 6 && g_defined[c] && g_hudFrame[c])
             hud[c][0] = NameHash("MOD_HudFrame_%d", c);
-        else if (c >= 6 && g_defined[c] && g_hasEmpty)  // no frame of its own: the grey frame
+        else if (c >= 6 && g_defined[c] && g_hasEmpty)  // no frame of its own: the gray frame
             hud[c][0] = IceHash("MOD_EMPTY_HudFrame");
     }
     static const struct { uint32_t va, table; int field; } HUD_READS[] = {
@@ -2630,11 +2630,11 @@ bool ClassesInit()
     } else {
         Log("classes: base stat read not as expected, left alone");
     }
-    if (CodeAt(COLOUR_REC - 5, "83fe067211") && CodeAt(COLOUR_REC, "0fb642400faf4234")) {
-        g_colourRecDone = (uintptr_t)Game(COLOUR_REC_DONE);
+    if (CodeAt(COLOR_REC - 5, "83fe067211") && CodeAt(COLOR_REC, "0fb642400faf4234")) {
+        g_colorRecDone = (uintptr_t)Game(COLOR_REC_DONE);
         uint8_t jmp[5] = {0xE9};
-        *(int32_t*)(jmp + 1) = (int32_t)((uintptr_t)&h_colourRecord - (uintptr_t)Game(COLOUR_REC + 5));
-        Write(COLOUR_REC, jmp, 5);
+        *(int32_t*)(jmp + 1) = (int32_t)((uintptr_t)&h_colorRecord - (uintptr_t)Game(COLOR_REC + 5));
+        Write(COLOR_REC, jmp, 5);
     } else {
         Log("classes: COLOR record lookup not as expected, left alone");
     }

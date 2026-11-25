@@ -78,7 +78,7 @@ did and what happened, and attach the zip. The logs hold no saves, but
 they do contain folder paths (which can include your Windows user name).
 
 
-LICENCE AND SOURCE
+LICENSE AND SOURCE
 ------------------
 The mod loader, the Mod Manager and the tools are free software under the
 GNU GPL, version 3 or later (LICENSE.txt). The complete source is in the

@@ -1,5 +1,5 @@
 r"""Start a new class mod: a folder laid out like mod/ with one class in classes.csv, a placeholder
-look (the class whose moves it borrows, recoloured), and its select / portrait / HUD pictures.
+look (the class whose moves it borrows, recolored), and its select / portrait / HUD pictures.
 Then replace the placeholder art with your own and run Build mod on the folder.
 
     python -I tools/new_class.py <folder> "<Class name>" [--moves empress] [--hue 210]
@@ -7,7 +7,7 @@ Then replace the placeholder art with your own and run Build mod on the folder.
 
 <folder>  where the mod's sheets go (made if missing; files already there are kept)
 --moves   which class's moves it borrows: empress, warrior, shinobi, witch, oracle, bandit
---hue     how far to turn the placeholder colours (degrees), so it can't be mistaken for the original
+--hue     how far to turn the placeholder colors (degrees), so it can't be mistaken for the original
 
 Build it: tools\py.bat tools\build_mod.py --mod <folder>   (tools\py.bat uses the kit's own Python)
 """
@@ -59,7 +59,7 @@ def main(argv):
             "[mod]\nname=%s\nversion=0.1\nauthor=%s\ndescription=Adds the %s class.\nfolder=%s\n"
             % (arg(argv, "--title", name), arg(argv, "--author", ""), name, mod_folder))
 
-    # body: a copy of the borrowed class's (redraw its frames in sprites\<body>); palette: its, recoloured
+    # body: a copy of the borrowed class's (redraw its frames in sprites\<body>); palette: its, recolored
     open(os.path.join(folder, "sprites", body, "_source.txt"), "w").write("pl%d_cb00\n" % k)
     tmp = os.path.join(folder, "palettes", "_tmp.png")
     palettes.export_png(sprites.load("Win/pl%d_pal.osb" % k), tmp)
@@ -67,7 +67,7 @@ def main(argv):
     os.remove(tmp)
     osb.write_png(os.path.join(folder, "palettes", "%s from pl%d_pal.png" % (pal, k)), w, h, mtc.rotate(img, deg))
 
-    # select / portrait / HUD pictures: the borrowed class's, recoloured (mtc writes into its MOD)
+    # select / portrait / HUD pictures: the borrowed class's, recolored (mtc writes into its MOD)
     mtc.MOD = folder
     banks = [sprites.load("Win/%s.osb" % n) for n in ("s_o0a00", "com_pl_icon", "s_o0200", "cp_o0000")]
     art = mtc.art_for(0, k, deg, banks)
@@ -79,7 +79,7 @@ def main(argv):
 
     row = dict.fromkeys(COLUMNS, "")
     row.update({"id": stem, "name": name.upper(), "moves": moves, "body": body, "palette": pal,
-                "description": "%s\n(Placeholder look: the\n%s, recoloured.)" % (name.upper(), moves.capitalize()),
+                "description": "%s\n(Placeholder look: the\n%s, recolored.)" % (name.upper(), moves.capitalize()),
                 "notes": "made by new_class.py (%s's moves, hue +%g); replace the art with your own" % (moves, deg)})
     row.update(renamed)
     path = os.path.join(folder, "classes.csv")

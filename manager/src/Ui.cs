@@ -1,4 +1,4 @@
-// The manager's look (from manager/mockup): colours, fonts and the few controls it's built
+// The manager's look (from manager/mockup): colors, fonts and the few controls it's built
 // from, made in code (no XAML compiler needed to build it).
 using System;
 using System.Windows;
@@ -384,7 +384,7 @@ namespace DmfdManager
             return p;
         }
 
-        // An input with grey hint text while it's empty.
+        // An input with gray hint text while it's empty.
         public static Grid WithHint(TextBox box, string hint)
         {
             var g = new Grid();
@@ -469,7 +469,7 @@ namespace DmfdManager
     }
 
 
-    // Dialog boxes in the manager's own style (instead of Windows' grey message boxes).
+    // Dialog boxes in the manager's own style (instead of Windows' gray message boxes).
     static class Dialogs
     {
         [System.Runtime.InteropServices.DllImport("dwmapi.dll")]
@@ -483,7 +483,7 @@ namespace DmfdManager
                 IntPtr h = new System.Windows.Interop.WindowInteropHelper(w).Handle;
                 int on = 1;
                 if (DwmSetWindowAttribute(h, 20, ref on, 4) != 0) DwmSetWindowAttribute(h, 19, ref on, 4);  // 19: Windows 10 before 2004
-                int caption = 0x0d | 0x08 << 8 | 0x09 << 16;  // Windows 11: the sidebar's colour (COLORREF 0x00BBGGRR)
+                int caption = 0x0d | 0x08 << 8 | 0x09 << 16;  // Windows 11: the sidebar's color (COLORREF 0x00BBGGRR)
                 DwmSetWindowAttribute(h, 35, ref caption, 4);
             }
             catch { }

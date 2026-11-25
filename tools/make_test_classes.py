@@ -1,4 +1,4 @@
-"""Developers only: fills mod/ with the recoloured test classes (shipped in Test Classes since 0.8) for checking many
+"""Developers only: fills mod/ with the recolored test classes (shipped in Test Classes since 0.8) for checking many
 classes at once (paging, empty spaces, online). Each test class's base is the class whose
 spot it takes on its page (class % 6), so the base's select / portrait / HUD art fits; all
 its art and its body palette are the base's, hue-rotated. NO_ART classes get no pictures
@@ -32,7 +32,7 @@ def rotate(img, deg, min_sat=0.3):
 
 
 def save_mesh(b, mesh, deg, path_stem):
-    """Render one picture with the exporter's margin/origin naming, recoloured."""
+    """Render one picture with the exporter's margin/origin naming, recolored."""
     x0, y1, w, h = sprites.canvas(b, [mesh])
     M = sprites.MARGIN
     box = (x0 - M, y1 + M, w + 2 * M, h + 2 * M)
@@ -97,7 +97,7 @@ def main():
                 row["id"] = "t%03d_test_%d_%s" % (c, c, BASES[k])
             row.update({"class": str(c), "base": BASES[k], "body": "pl%d_cb00" % c, "palette": "pl%d_pal" % c,
                         "name": "TEST %d %s" % (c, BASES[k].upper()),
-                        "description": "CLASS %d - PAGE %d\nA recoloured %s for\ntesting many classes%s." %
+                        "description": "CLASS %d - PAGE %d\nA recolored %s for\ntesting many classes%s." %
                                        (c, c // 6 + 1, BASES[k].capitalize(),
                                         "\n(no pictures of its own)" if c in NO_ART else ""),
                         "notes": "%s (hue +%d)" % (TAG, deg)})

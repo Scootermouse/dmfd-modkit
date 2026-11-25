@@ -16,9 +16,9 @@ contract. Slot = three section offsets {A, B, C}:
      +0x00 name (UTF-8, full width), +0x34..+0x58 ten offsets relative to the record
      (field 2 is a number): +0x34 setup block, then eight more per-class blocks.
   C: inventory (0x800 x 8 bytes).
-Setup block (0x34): +0 class, +1 colour, +2 voice, +3 ?, +4 level, ..., +0x14.. four
+Setup block (0x34): +0 class, +1 color, +2 voice, +3 ?, +4 level, ..., +0x14.. four
 equipped items {u32 label hash, u32 equipped flag}. The game's validator (0xC928A0)
-clamps class <= 5, colour/voice <= 7, level 1..100.
+clamps class <= 5, color/voice <= 7, level 1..100.
 Six records and their blocks fill section B: there is no room for a seventh class,
 which is why the content mod keeps extra classes in SystemData.bin.classes:
   {u32 'DMCX', u32 3, u32 contracts, u32 count} then per class {u32 class, per
@@ -96,7 +96,7 @@ def contracts(m):
             r = B + k * u32(m, 0x1C)
             s = r + u32(m, r + 0x34)
             name = m[r:r + 0x34].split(b"\0")[0].decode("utf-8", "replace")
-            recs.append({"name": name, "class": m[s], "colour": m[s + 1], "voice": m[s + 2], "level": m[s + 4],
+            recs.append({"name": name, "class": m[s], "color": m[s + 1], "voice": m[s + 2], "level": m[s + 4],
                          "items": [struct.unpack_from("<II", m, s + o) for o in (0x14, 0x1C, 0x24, 0x2C)]})
         out.append({"number": c + 1, "A": A, "B": B, "C": C, "created": m[A + 2], "active": m[A + 3], "classes": recs})
     return out
@@ -130,7 +130,7 @@ def read_classes_file(path, m):
             o += size
             if size:
                 s = blob[0x38:0x38 + 0x34]
-                per[c + 1] = {"class": s[0], "colour": s[1], "voice": s[2], "level": s[4], "created": created,
+                per[c + 1] = {"class": s[0], "color": s[1], "voice": s[2], "level": s[4], "created": created,
                               "items": [struct.unpack_from("<II", s, x) for x in (0x14, 0x1C, 0x24, 0x2C)]}
         out[cls] = per
     return out
@@ -146,14 +146,14 @@ def main(argv):
         print("Contract %d: active class %d, created flags %#x" % (con["number"], con["active"], con["created"]))
         for name, r in zip(CLASSES, con["classes"]):
             eq = sum(1 for _, f in r["items"] if f)
-            print("   %-8s class %d  Lv %3d  colour %d voice %d  %d item(s) equipped" %
-                  (name, r["class"], r["level"], r["colour"], r["voice"], eq))
+            print("   %-8s class %d  Lv %3d  color %d voice %d  %d item(s) equipped" %
+                  (name, r["class"], r["level"], r["color"], r["voice"], eq))
         for cls, per in sorted((extra or {}).items()):
             if con["number"] in per:
                 r = per[con["number"]]
                 eq = sum(1 for _, f in r["items"] if f)
-                print("   class %-3d (SystemData.bin.classes) Lv %3d  colour %d voice %d  %d item(s) equipped" %
-                      (cls, r["level"], r["colour"], r["voice"], eq))
+                print("   class %-3d (SystemData.bin.classes) Lv %3d  color %d voice %d  %d item(s) equipped" %
+                      (cls, r["level"], r["color"], r["voice"], eq))
 
 
 if __name__ == "__main__":

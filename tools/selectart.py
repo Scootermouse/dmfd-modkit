@@ -3,12 +3,12 @@ r"""Character-select art for extra classes, added to Win/s_o0a00.osb.
 For an extra class (class 6+ sits on page class // 6, panel class % 6):
   - panel_art: its sepia panel picture, a copy of an exported panel picture
     (s_o0a00\mesh_m135..m140_o-24_24.png) redrawn; the file name keeps the position.
-  - highlight_art: its coloured picture shown on the selected panel, a copy of an
+  - highlight_art: its colored picture shown on the selected panel, a copy of an
     exported highlight (s_o0a00\a043_f00_m56_o-32_24.png = Empress, ...) redrawn.
 Build mod adds them as new pictures, an animation MOD_SEL_<class> for the
 highlight (a copy of the panel's own), and per page with panel art a copy of the
 panel layout (キャラクターセレクト2) named MOD_SEL_PAGE<page>; panels with no class
-on a page show their picture greyed (they can't be picked). The content mod
+on a page show their picture grayed (they can't be picked). The content mod
 switches to these when the page changes.
 
 The page prompt ("RT Page 1/2" under Confirm / Return) is drawn by the game itself:
@@ -36,7 +36,7 @@ EMPTY_PANEL = (108, 68, 40, 255)  # the dark brown of the select screen's wood
 
 
 def image_tiles(w, h, img, ox, oy):
-    """16x16 canvas tiles (BGRA) of a full-colour picture whose top-left canvas point is (ox, oy)."""
+    """16x16 canvas tiles (BGRA) of a full-color picture whose top-left canvas point is (ox, oy)."""
     T = sprites.TILE
     blocks = {}
     for row in range(h):
@@ -179,8 +179,8 @@ def hud_frames(b, classes, report=print):
 
 
 # ---- "empty" pictures -------------------------------------------------------
-# One look for "nothing here": the game's own grey "no element" dash icon (com_elic,
-# its sixth picture), centred on the spot at a whole-number size (1x to 3x, about
+# One look for "nothing here": the game's own gray "no element" dash icon (com_elic,
+# its sixth picture), centered on the spot at a whole-number size (1x to 3x, about
 # half the spot) so its pixels stay crisp. Used for empty slots when paging and for a
 # class that has no picture of its own for that spot (never its base class's art).
 EMPTY_ICON = ("Win/com_elic.osb", 5)
@@ -209,8 +209,8 @@ def _root(b, anim_hash):
 
 
 def empty_picture(b, mesh, silhouette=None):
-    """(w, h, img, ox, oy): the dash centred on the canvas of picture `mesh`. silhouette =
-    (r, g, b, a) also fills the picture's own shape with that colour first (a panel that
+    """(w, h, img, ox, oy): the dash centered on the canvas of picture `mesh`. silhouette =
+    (r, g, b, a) also fills the picture's own shape with that color first (a panel that
     keeps its outline but shows no character)."""
     x0, y1, w, h = sprites.canvas(b, [mesh])
     img = bytearray(w * h * 4)
@@ -234,17 +234,17 @@ def empty_picture(b, mesh, silhouette=None):
 
 
 # The quest HUD life frame has no "picture" to replace with the dash: its empty version is a
-# plain grey bevelled frame of the same layout (a box for the face, a housing round the
+# plain gray bevelled frame of the same layout (a box for the face, a housing round the
 # life bar, a tab behind "LV."), keeping the template's black bar slot and "LV." exactly.
 # Rectangles are in the template's canvas pixels (the frame is drawn in 2x2 blocks).
 FRAME_SHAPES = [(0, 4, 62, 90), (56, 30, 290, 62), (78, 14, 108, 32)]
 FRAME_KEEP = [(80, 16, 106, 32), (60, 32, 288, 60)]  # where the template's own black / white stays
-FRAME_GREYS = {"edge": (36, 36, 44), "light": (196, 196, 200), "fill": (132, 132, 138),
+FRAME_GRAYS = {"edge": (36, 36, 44), "light": (196, 196, 200), "fill": (132, 132, 138),
                "shadow": (84, 84, 90)}
 
 
 def empty_frame(b, mesh):
-    """(w, h, img, ox, oy): the grey bevelled version of life frame picture `mesh`."""
+    """(w, h, img, ox, oy): the gray bevelled version of life frame picture `mesh`."""
     x0, y1, w, h = sprites.canvas(b, [mesh])
     _, _, imgs = sprites.render(b, [mesh], box=(x0, y1, w, h))
     src = imgs[0]
@@ -259,13 +259,13 @@ def empty_frame(b, mesh):
             if not inside[by][bx]:
                 continue
             if not (at(bx - 1, by) and at(bx + 1, by) and at(bx, by - 1) and at(bx, by + 1)):
-                c = FRAME_GREYS["edge"]
+                c = FRAME_GRAYS["edge"]
             elif not (at(bx - 2, by) and at(bx, by - 2)):
-                c = FRAME_GREYS["light"]
+                c = FRAME_GRAYS["light"]
             elif not (at(bx + 2, by) and at(bx, by + 2)):
-                c = FRAME_GREYS["shadow"]
+                c = FRAME_GRAYS["shadow"]
             else:
-                c = FRAME_GREYS["fill"]
+                c = FRAME_GRAYS["fill"]
             for y in range(by * S, min(h, by * S + S)):
                 for x in range(bx * S, min(w, bx * S + S)):
                     o = (y * w + x) * 4
@@ -282,7 +282,7 @@ def empty_frame(b, mesh):
 
 def add_empties(b, names, report=print):
     """For each (template animation name, new name[, "frame"]) in this sprite bank: a copy
-    of the template showing the empty picture (or the grey life frame). -> new bytes."""
+    of the template showing the empty picture (or the gray life frame). -> new bytes."""
     m = osbedit.parse(b)
     fill = {}
     for entry in names:

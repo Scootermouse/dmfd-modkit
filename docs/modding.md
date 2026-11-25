@@ -51,7 +51,7 @@ Manager. Another mod folder builds with `tools\py.bat tools\build_mod.py --mod <
 | `order` | Sort position in lists. |
 | `sprite` | Weapons: which weapon picture it shows, e.g. `pl0_cw00` (the starting sword), or a new sprite folder of yours (see Weapon sprites). |
 | `sprite_palette` | Weapons: the palette file for that picture, as in `all_items.csv`. Usually leave it. |
-| `colour` | Weapons: which colour scheme of the palette, e.g. starting sword `0` grey blade, `4` red blade. `all_items.csv` shows what each weapon uses. |
+| `color` | Weapons: which color scheme of the palette, e.g. starting sword `0` gray blade, `4` red blade. `all_items.csv` shows what each weapon uses. (The older spelling `colour` still works.) |
 | `notes` | Anything; ignored. |
 
 | `effect1` `effect2` `effect3` | The item's three effect slots: an effect name from `all_effects.csv` (e.g. `LEVEL_DAMAGE_UP`), or `none`. |
@@ -91,7 +91,7 @@ When a chest opens, the game picks the table for your level, rolls whether its r
 3. Run **Build mod.bat**.
 
 Things to know:
-- Colours are matched to the class's palette, so edits follow whichever colour scheme the player picks. Unchanged colours come back exactly.
+- Colors are matched to the class's palette, so edits follow whichever color scheme the player picks. Unchanged colors come back exactly.
 - Frames are built from shared tiles, so redrawing a piece in one frame can change other frames that use the same tile.
 - You can paint anywhere in the picture, including outside the character's original outline. Exported frames have a 24-pixel empty border for this. Don't resize or crop the pictures, because the position in the file name would no longer match. For more room, raise `MARGIN` in `tools\sprites.py` and export again.
 - Pixels inside the original pieces are edited in place. Pixels outside them become new 16×16 tiles on the sprite sheet (Build mod reports how many). Identical tiles are stored once. If the sheet is full, Build mod makes it taller automatically.
@@ -102,32 +102,32 @@ Things to know:
 A full walk-through (new art, item, placement, timing, reach, effects, and a custom class's own
 weapons): [weapon-example.md](weapon-example.md).
 
-**Export weapon sprites.bat** writes every weapon picture to `mod\sprites_original\<file>\` (`pl0_cw00` … `pl4_cw00`, Shinobi throwing weapons `pl2_tw00` …), plus `mod\sprites_original\weapons.csv`: which items use each picture, with their colour numbers.
+**Export weapon sprites.bat** writes every weapon picture to `mod\sprites_original\<file>\` (`pl0_cw00` … `pl4_cw00`, Shinobi throwing weapons `pl2_tw00` …), plus `mod\sprites_original\weapons.csv`: which items use each picture, with their color numbers.
 
-- **Change an existing weapon picture:** copy frames into `mod\sprites\<same folder>\` and edit them, like bodies. Every item using that picture changes, for every class that uses it (Bandit's daggers are Empress pictures, her shuriken Shinobi pictures).
+- **Change an existing weapon picture:** copy frames into `mod\sprites\<same folder>\` and edit them, like bodies. Every item using that picture changes, for every class that uses it (Bandit's daggers are Empress pictures, his shuriken Shinobi pictures).
 - **Make a new weapon picture:** copy a **whole** exported folder into `mod\sprites\` and give it a new name, using only letters, digits and `_`, e.g. `mod_cw00`. Redraw what you like (the `_source.txt` inside says which picture it started from; keep it). Then set your item's `sprite` to `mod_cw00`. The game's own weapons stay as they are.
-- Edits use the palette's first colour scheme. Other schemes (`colour`) recolour your edit the same way they recolour the original.
-- Four Shinobi weapons (`pl2_cw01`–`pl2_cw04`) are full-colour pictures: edits keep your exact colours, and `colour` doesn't apply to them.
+- Edits use the palette's first color scheme. Other schemes (`color`) recolor your edit the same way they recolor the original.
+- Four Shinobi weapons (`pl2_cw01`–`pl2_cw04`) are full-color pictures: edits keep your exact colors, and `color` doesn't apply to them.
 
-### Portraits and other full-colour art
+### Portraits and other full-color art
 
-**Export sprites.bat** also exports these full-colour pictures to `mod\sprites_original\`. Edit them like body frames (copy into `mod\sprites\<same folder>\`); colours and soft edges are kept exactly.
+**Export sprites.bat** also exports these full-color pictures to `mod\sprites_original\`. Edit them like body frames (copy into `mod\sprites\<same folder>\`); colors and soft edges are kept exactly.
 
 | Folder | What it is |
 |---|---|
 | `com_pl_icon` | Class portraits in menus (equip menu, load screen). Large: Empress `a011`, Warrior `a001`, Witch `a002`, Shinobi `a003`, Oracle `a004`, Bandit `a010`; the other six are the small versions. |
-| `s_o0a00` | The character select screen: class illustrations in colour (narrow: Empress `a043`; wide/highlighted: Empress `a119`) and sepia (`mesh_m131`–`m140`, unselected), background, contract-colour icons, labels in every language, frames. |
-| `cutin00` | The dragon orb cut-in: one tall illustration per class (Empress `mesh_m3…`) and coloured backgrounds. |
+| `s_o0a00` | The character select screen: class illustrations in color (narrow: Empress `a043`; wide/highlighted: Empress `a119`) and sepia (`mesh_m131`–`m140`, unselected), background, contract-color icons, labels in every language, frames. |
+| `cutin00` | The dragon orb cut-in: one tall illustration per class (Empress `mesh_m3…`) and colored backgrounds. |
 | `cp_o0000` | The in-quest HUD, including its own small class portraits. |
 | `face`, `EmFace` | NPC and enemy faces in dialogue. |
 
-Pictures that no animation shows by itself are exported as `mesh_m<number>_….png`; they edit the same way. A reskinned class needs its art changed in all of these: body, portraits (`com_pl_icon` and `cp_o0000`), select screen (`s_o0a00`, colour and sepia) and cut-in (`cutin00`).
+Pictures that no animation shows by itself are exported as `mesh_m<number>_….png`; they edit the same way. A reskinned class needs its art changed in all of these: body, portraits (`com_pl_icon` and `cp_o0000`), select screen (`s_o0a00`, color and sepia) and cut-in (`cutin00`).
 
 ### Extra classes (classes.csv)
 
 `classes.csv` defines classes beyond the six, one row each. The quickest start is
 `tools\py.bat tools\new_class.py <folder> "<Class name>" --moves empress`: it makes a mod folder with
-one class, a placeholder look (the borrowed class recoloured) and all its pictures. Build it with
+one class, a placeholder look (the borrowed class recolored) and all its pictures. Build it with
 `tools\py.bat tools\build_mod.py --mod <folder>`.
 
 | Column | Meaning |
@@ -138,7 +138,7 @@ one class, a placeholder look (the borrowed class recoloured) and all its pictur
 | `body` | Its body sprite folder in `sprites\`, e.g. `cleric_cb00` (a copy of a body: the folder's `_source.txt` names the original, e.g. `pl0_cb00`). |
 | `palette` | Its palette, e.g. `cleric_pal` (from `palettes\cleric_pal from pl0_pal.png`). |
 | `description` | Text for the info box when creating a character (pages separated by `\|`; missing pages are the base class's). |
-| `panel_art`, `highlight_art`, `portrait_art`, `portrait_large_art`, `bar_face_art`, `hud_face_art`, `hud_face2_art`, `hud_frame_art` | Its pictures for character select, menus, the bar and the quest HUD (file paths in the mod folder; `new_class.py` makes them). An empty one shows the game's grey "empty" dash. |
+| `panel_art`, `highlight_art`, `portrait_art`, `portrait_large_art`, `bar_face_art`, `hud_face_art`, `hud_face2_art`, `hud_frame_art` | Its pictures for character select, menus, the bar and the quest HUD (file paths in the mod folder; `new_class.py` makes them). An empty one shows the game's gray "empty" dash. |
 | `test_saves` | `1` while testing: the game's save writes go to `SystemData.bin.class-test` instead of your save. |
 
 **Numbers and pages are given out automatically.** The Mod Manager (or Build mod) numbers every
@@ -147,7 +147,7 @@ of character select, sorted by `id`. So installing another class can move yours 
 saves follow the `id`, so characters stay with their class.
 
 **Playing one:** on character select, at the inn and in the bar, **Page Down / Page Up** or
-**RT / LT** change page. The first time you pick an extra class it shows NEW: you choose its colour,
+**RT / LT** change page. The first time you pick an extra class it shows NEW: you choose its color,
 voice and name, and it starts at level 1.
 
 **Saves:** your `SystemData.bin` always holds the six classes' own data, so the game works the same
@@ -204,7 +204,7 @@ with `#` are comments.
 - **`_hitboxes.txt`**: where a frame hits (*confirmed in game*). Each frame picture (`m<number>` in
   its file name) has its own attack boxes.
   - `m<mesh> attack <x> <y> <w> <h> <kind>`: that picture's attack boxes become this one box
-    (centre x, centre y measured up from the feet, width, height; kind 0 = body, 10/11 = the
+    (center x, center y measured up from the feet, width, height; kind 0 = body, 10/11 = the
     Empress's sword strike).
   - `m<mesh> attack none`: that picture deals no hit.
   - `m<mesh> attack <x> <y> <w> <h> <kind> from m<donor>`: for a picture with no attack box, take
@@ -248,9 +248,9 @@ with `#` are comments.
   copy the folder under a new name first (Weapon sprites). Body nodes with positions
   (channels 7/8, see `_tracks.txt`) are effect attach points such as the Empress's tether, not
   weapons. (*Confirmed in game: the Empress's sword 40 px higher in her idle.*)
-- **`_tracks.txt`**: other animation values (*confirmed in game* for light colours):
+- **`_tracks.txt`**: other animation values (*confirmed in game* for light colors):
   `<animation name or 0xhash> <node 0xhash> <channel> <value>` sets every key of that track, e.g.
-  an effect's light colour (channels 10/11/12 = red/green/blue, 0 to 1).
+  an effect's light color (channels 10/11/12 = red/green/blue, 0 to 1).
 - **`_replace.txt`** (an empty file): each frame PNG in the folder is a whole new picture for its
   frame instead of an edit of the old one, so a class can look completely different
   (*confirmed in game*). It works in weapon folders too (`plN_cwXX`, `pl2_twXX` and copied new
@@ -309,23 +309,23 @@ Menu screens are built from named parts with a position and scale. `tools\py.bat
 | `file` | Sprite file, e.g. `s_o0a00` (character select). |
 | `anim` | Which layout (animation number); empty = every layout in the file that has the part. |
 | `part` | Part name, e.g. `PL1` (Empress panel), `PL1_Lv` (its level), `name_text`, `color`. |
-| `x`, `y` | Position: screen is about 640×360, centre is 0,0, y goes up. |
+| `x`, `y` | Position: screen is about 640×360, center is 0,0, y goes up. |
 | `scale_x`, `scale_y`, `picture` | Size (panels are 0.5) and which picture it shows. |
 
-Character select: `PL1`–`PL6` = Empress, Warrior, Shinobi, Witch, Oracle, Bandit at x −270…30 (60 apart), y 110; levels at y −84. The panel and its colour highlight follow the layout; the selector frame slides to the panel but keeps its own height.
+Character select: `PL1`–`PL6` = Empress, Warrior, Shinobi, Witch, Oracle, Bandit at x −270…30 (60 apart), y 110; levels at y −84. The panel and its color highlight follow the layout; the selector frame slides to the panel but keeps its own height.
 
-### Palettes (colour schemes)
+### Palettes (color schemes)
 
 **Export sprites.bat** writes the class palettes and **Export weapon sprites.bat** the weapon palettes to `mod\palettes_original\`, one picture per palette file (`pl0_pal.png` is the Empress, `pl0_cw00_pal.png` the starting sword's).
 
-- Each picture is a grid of squares: **one row per colour scheme, one square per colour.** Sprites are painted with the first row's colours; each scheme swaps those for its own.
-- Class palettes have 48 rows: 8 highlight colours (picked at character creation) × 6 contract elements, row = highlight × 6 + element. For the Empress, squares 33–36 are the dragon arm (element) and 16, 49–52 the highlight colour; everything else (skin, hair, armour…) is the same in all 48 rows.
-- **Edit:** copy the picture into `mod\palettes\`, fill squares with new colours (paint bucket), run **Build mod.bat**. Don't resize it.
-- **Shortcut:** a colour that's the same in every row only needs changing in the **first row**; Build mod copies it to all rows (unless you also edited other rows of that column).
-- A weapon's `colour` in items.csv is the row number in its palette.
+- Each picture is a grid of squares: **one row per color scheme, one square per color.** Sprites are painted with the first row's colors; each scheme swaps those for its own.
+- Class palettes have 48 rows: 8 highlight colors (picked at character creation) × 6 contract elements, row = highlight × 6 + element. For the Empress, squares 33–36 are the dragon arm (element) and 16, 49–52 the highlight color; everything else (skin, hair, armor…) is the same in all 48 rows.
+- **Edit:** copy the picture into `mod\palettes\`, fill squares with new colors (paint bucket), run **Build mod.bat**. Don't resize it.
+- **Shortcut:** a color that's the same in every row only needs changing in the **first row**; Build mod copies it to all rows (unless you also edited other rows of that column).
+- A weapon's `color` in items.csv is the row number in its palette.
 - **New palette file**, e.g. for a new weapon: name the picture `<new name> from <game palette>.png`, e.g. `mod_cw00_pal from pl0_cw00_pal.png`, and set the item's `sprite_palette` to `mod_cw00_pal`.
-- Adding extra rows (more colour schemes) isn't possible yet.
-- To find which square a colour in a sprite is, use a colour picker on an exported frame and look for the same colour in the first row.
+- Adding extra rows (more color schemes) isn't possible yet.
+- To find which square a color in a sprite is, use a color picker on an exported frame and look for the same color in the first row.
 
 ### text.csv
 
@@ -358,7 +358,7 @@ the folder's path in `tools\game.txt` (the Mod Manager writes that file when it 
 Code mods are DLLs the loader starts from `mods\<Name>\` (each with a `mod.ini` naming its `dll=`).
 They change what the game's program does, which data can't: damage rules, moves, menus. See
 `codemods/` in the source: `common/` is the small API they share (logging, hooks with MinHook, a tab
-in the in-game Insert menu; MIT licensed, so mods can use any licence), and Holy Up
+in the in-game Insert menu; MIT licensed, so mods can use any license), and Holy Up
 (`codemods/HolyUp`, explained in [holy-up.md](holy-up.md)) is a complete example.
 Build them with `tools\build_codemods.bat` (Visual Studio 2019 Build Tools, 32-bit).
 

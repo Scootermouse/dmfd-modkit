@@ -1,5 +1,5 @@
 """Developers only: write src/fresh_classes.inc, the six base classes' records as a brand-new
-contract holds them (level 1, starting gear, default colour and voice), for extra classes
+contract holds them (level 1, starting gear, default color and voice), for extra classes
 that start fresh instead of as a copy of the player's character.
 
 The records are taken from a save made right after installing the game (contract 1, before any

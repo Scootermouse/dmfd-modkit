@@ -13,7 +13,7 @@
 //   USE0000_  price=8 power=30                     change an item
 //   new MOD_HERB_ copy=USE0001_ price=150 power=75  add an item, starting from a copy
 //   SWORD0000_ @0x40=60                            raw u32 at a record offset (@0x7c:1 = byte, :2 = u16)
-//   SWORD0000_ sprite=pl0_cw20.osb colour=2         weapon look: sprite file, palette number
+//   SWORD0000_ sprite=pl0_cw20.osb color=2         weapon look: sprite file, palette number
 // A new item also needs a name: add its label to sys_item.tb2 (tools/tb2.py).
 #include "content.h"
 #include <algorithm>
@@ -42,7 +42,8 @@ static const Field FIELDS[] = {
     {"shop", 0x7C, 1},    // 0 = not sold; 0x1N tool shop, 0x2N weapon shop; low bits = shop tier
     {"unlock", 0x7E, 2},  // story progress needed before shops offer it (0 = from the start, -1 = never)
     {"order", 0x84, 4},   // sort position in lists
-    {"colour", 0x20, 4},  // weapons: palette number in the sprite's palette file
+    {"color", 0x20, 4},  // weapons: palette number in the sprite's palette file
+    {"colour", 0x20, 4}, // the same, as spelled before 0.11 (mods built by older tools)
 };
 // Text fields: string-pool offsets. The new text is kept in our memory for good.
 static const Field TEXT_FIELDS[] = {

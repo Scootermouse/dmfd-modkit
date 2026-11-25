@@ -128,7 +128,7 @@ static void Pace(uint8_t* sp, const Tweak* t)
     __try {
         if (InterlockedIncrement(&g_probeLogs) <= 4) {
             float* c = (float*)(sp + 0xF4);
-            Log("effect 0x%08x sprite: colour? %.2f %.2f %.2f %.2f, speed %.2f, playing %d, removed %d", t->hash,
+            Log("effect 0x%08x sprite: color? %.2f %.2f %.2f %.2f, speed %.2f, playing %d, removed %d", t->hash,
                 c[0], c[1], c[2], c[3], *(float*)(sp + 0x124), sp[0x1A0], sp[0x1A2]);
         }
         if (t->speed > 0.0f) *(float*)(sp + 0x124) *= t->speed;

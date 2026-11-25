@@ -554,7 +554,7 @@ namespace DmfdManager.Data
             return new[] { x0, y1, x1 - x0, y1 - y0 };
         }
 
-        // Frames drawn on a shared canvas (full colour, RGBA): (w, h, picture per mesh).
+        // Frames drawn on a shared canvas (full color, RGBA): (w, h, picture per mesh).
         public static List<byte[]> Render(byte[] b, int[] meshes, int[] box, out int W, out int H)
         {
             var tex = FirstTex(b);
@@ -1228,7 +1228,7 @@ namespace DmfdManager.Data
             return Sprites.AddTiles(OsbEdit.Build(m), fill, report);
         }
 
-        // ---- "empty" pictures: the game's grey "no element" dash (com_elic, sixth picture) ----
+        // ---- "empty" pictures: the game's gray "no element" dash (com_elic, sixth picture) ----
         static byte[] Dash(out int w, out int h)
         {
             var b = Sprites.Load("Win/com_elic.osb");

@@ -39,7 +39,7 @@ def load(asset):
 
 
 def is_paletted(b):
-    """Paletted sheets store pixels as (0, 0, index, alpha); a few are full colour instead."""
+    """Paletted sheets store pixels as (0, 0, index, alpha); a few are full color instead."""
     tex = osb.textures(b)[0]
     px = b[tex["ofs"]:tex["ofs"] + tex["w"] * tex["h"] * 4]
     return not (px[0::4].strip(b"\0") or px[1::4].strip(b"\0"))
@@ -219,9 +219,9 @@ def nearest_index(rgba, pal, cache):
 
 def import_frames(b, pngs, pal, report=print, replace=False):
     """Write edited frame PNGs back into the atlas. Returns the new decoded file
-    (or None if nothing changed). Colours are matched to the palette; a pixel
-    whose colour didn't change keeps its exact palette index. pal=None means a
-    full-colour sheet: pixels (including partial transparency) are stored as they are.
+    (or None if nothing changed). Colors are matched to the palette; a pixel
+    whose color didn't change keeps its exact palette index. pal=None means a
+    full-color sheet: pixels (including partial transparency) are stored as they are.
 
     replace=True: each PNG is a whole new picture for its frame. The frame drops its old
     tiles (other frames that shared them keep them) and gets new tiles of its own, so a
@@ -271,13 +271,13 @@ def import_frames(b, pngs, pal, report=print, replace=False):
                         changed += 1
                 continue
             owner = vis[-1] if vis else offs[-1]
-            if pal is None:  # full colour: store the pixel as it is (BGRA)
+            if pal is None:  # full color: store the pixel as it is (BGRA)
                 new = bytes((p[2], p[1], p[0], p[3]))
                 if vis and b[owner:owner + 4] == new:
                     continue
             else:
                 if vis and pal[b[owner + 2]][:3] == bytes(p[:3]):
-                    continue  # unchanged colour: keep the exact index
+                    continue  # unchanged color: keep the exact index
                 i, dist = nearest_index(bytes(p[:3]) + b"\xff", pal, cache)
                 if dist:
                     approx += 1
@@ -309,7 +309,7 @@ def import_frames(b, pngs, pal, report=print, replace=False):
             top = oy - br * TILE  # dest y just above the block's first row
             new_tiles.setdefault(mesh, []).append((ax, top - TILE, bytes(tile)))
     if approx:
-        report("sprites: %d pixel(s) weren't palette colours and got the nearest one" % approx)
+        report("sprites: %d pixel(s) weren't palette colors and got the nearest one" % approx)
     if cleared:
         meshes = _meshes_raw(bytes(out))
         out = bytearray(rebuild_meshes(bytes(out), [(b"", b"") if k in cleared else mv
@@ -467,7 +467,7 @@ def add_tiles(b, new_tiles, report=print, max_h=4096):
 
 
 def set_track(b, anim_hash, node_hash, channel, value):
-    """Set every key of one animation track (a node's channel) to value: e.g. the colour of an
+    """Set every key of one animation track (a node's channel) to value: e.g. the color of an
     effect's light (channels 10/11/12 = red/green/blue, 0..1). Not for channel 0 (pictures).
     -> (new bytes, number of keys changed)."""
     hs, n = _u(b, 0), _u(b, 0x20)
@@ -493,7 +493,7 @@ def set_track(b, anim_hash, node_hash, channel, value):
 def hitbox_table(b):
     """Per frame picture (mesh) collision: the table at header +0x28 has, for each mesh, two
     {u32 count, u32 offset} pairs: attack boxes, then hurt (body) boxes. A box is 5 int32:
-    centre x, centre y (up from the feet), width, height, kind (0 = body; 10/11 seen on the
+    center x, center y (up from the feet), width, height, kind (0 = body; 10/11 seen on the
     Empress's sword strike). The game's collision uses the boxes of the picture being shown."""
     return _u(b, 0x28)
 

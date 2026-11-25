@@ -27,12 +27,12 @@ file named `_replace.txt` to the folder: each PNG then becomes a whole new pictu
 
 In `mod\items.csv`, add a row (one per weapon):
 
-| label | copy_from | name | atk | sprite | colour |
+| label | copy_from | name | atk | sprite | color |
 |---|---|---|---|---|---|
 | `MOD_SWORD_` | `SWORD0000_` | My Sword | 30 | `mod_cw00` | 0 |
 
 `copy_from` starts it from the Shortsword (its category, icon and stats); `sprite` points it at
-your new file. Leave `sprite_palette` empty to keep the Shortsword's colours. Add `shop`, `price`,
+your new file. Leave `sprite_palette` empty to keep the Shortsword's colors. Add `shop`, `price`,
 stats and effects as you like (all columns: modding.md, items.csv).
 
 ## 4. Find the animations you want to change
@@ -83,7 +83,7 @@ A swing's hits come from its slash effect (the white arc), not from the body or 
 The Empress's slash effects are in `pl0_ef00`. Make `mod\sprites\pl0_ef00\_hitboxes.txt`:
 
 ```
-# hit 2's slash: one long box from about 40 to 260 px ahead (centre 150, up 30, 220 x 80, kind 2)
+# hit 2's slash: one long box from about 40 to 260 px ahead (center 150, up 30, 220 x 80, kind 2)
 0x984c24b9 attack 150 30 220 80 2
 ```
 

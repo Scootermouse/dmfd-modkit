@@ -67,10 +67,10 @@ def load_items(exe_path=EXE):
             "shop": "0x%02x" % r[0x7C],
             "unlock": struct.unpack_from("<h", r, 0x7E)[0],
             "equip": struct.unpack_from("<H", r, 0x48)[0],
-            # weapons: sprite file, palette file (strings) and colour (palette number)
+            # weapons: sprite file, palette file (strings) and color (palette number)
             "sprite": cstr(struct.unpack_from("<I", r, 0x18)[0]) if struct.unpack_from("<I", r, 0x18)[0] else "",
             "sprite_palette": cstr(struct.unpack_from("<I", r, 0x1C)[0]) if struct.unpack_from("<I", r, 0x1C)[0] else "",
-            "colour": struct.unpack_from("<I", r, 0x20)[0],
+            "color": struct.unpack_from("<I", r, 0x20)[0],
             **{name: struct.unpack_from("<h", r, ofs)[0] for name, ofs in STATS},
             "effects": [read_effect(r, n) for n in (1, 2, 3)],
             "raw": r.hex(),
@@ -87,7 +87,7 @@ EXTRA_EFFECT_NAMES = {0x822BC24B: "REVIVE"}  # Chief's Meat, Ashes of Life; name
 # Effects no game item uses, sorted by what the exe has for them. Each effect's
 # hash is kept in globals; the equip-effect code (0xcb8000-0xcbc000) and the
 # description lookup (0xccb000-0xccc000) compare against them. See FORMAT.md.
-UNUSED_WITH_CODE = {  # behaviour and description code both present: likely to work
+UNUSED_WITH_CODE = {  # behavior and description code both present: likely to work
     "DAMAGE_UP", "DAMAGE_UP_MAGIC", "DAMAGE_UP_TO_ELEMENT", "DRAGON_RESIST", "MAGIC_RESIST",
     "MAGIC_UP_NORMAL", "EFFECT_EXTENSION", "TIME_UP_CANDY_ITEM", "SPECIFIC_BREED_DRAGON",
     "RETRY_DAMAGE_UP_DRAGON", "DRAGON_DAMAGE_UP_DRAGON", "MAGIC_UP_ENCHANT", "HEAL_HP_RATE_STATUS_UP",

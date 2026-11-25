@@ -37,7 +37,7 @@ OUTS = [os.path.join(GAME, "DataMod"), os.path.join(ROOT, "build", "DataMod")]
 MANIFEST = "_built_by_build_mod.txt"  # lists the files this script owns in DataMod
 
 STAT_FIELDS = [name for name, _ in itemdb.STATS]  # str agi int vit luc pie atk matk def mdef acc macc crt
-NUMBER_FIELDS = ["price", "stars", "power", "icon", "order", "unlock", "colour"] + STAT_FIELDS
+NUMBER_FIELDS = ["price", "stars", "power", "icon", "order", "unlock", "color"] + STAT_FIELDS
 TEXT_FIELDS = ["sprite", "sprite_palette"]  # weapons: sprite file and palette file names
 # Effect columns -> raw record fields. effectN = kind (name), the rest are 16-bit parts.
 EFFECT_COLUMNS = {}
@@ -73,6 +73,8 @@ def read_csv(path):
     rows = []
     for i, row in enumerate(csv.DictReader(io.StringIO(text), delimiter=delim), start=2):
         row = {(k or "").strip().lower(): (v or "").strip() for k, v in row.items()}
+        if "colour" in row and not row.get("color"):  # spelling used before 0.11
+            row["color"] = row.pop("colour")
         if any(row.values()):
             row["_line"] = i
             rows.append(row)
@@ -359,11 +361,11 @@ def list_items():
                      it["stars"], it["shop"], it["unlock"], equip_names(it["equip"])]
                     + [it[s] for s in STAT_FIELDS] + effs + [it["icon"], it["order"]]
                     + ([it["sprite"][:-4] if it["sprite"].endswith(".osb") else it["sprite"],
-                        it["sprite_palette"], it["colour"]] if it["category"] in WEAPON_CATEGORIES
+                        it["sprite_palette"], it["color"]] if it["category"] in WEAPON_CATEGORIES
                        else ["", "", ""]))
     dst = os.path.join(MOD, "all_items.csv")
     write_csv(dst, ["label", "name", "category", "price", "stars", "shop", "unlock", "equip"]
-              + STAT_FIELDS + eff_cols + ["icon", "order", "sprite", "sprite_palette", "colour"], rows)
+              + STAT_FIELDS + eff_cols + ["icon", "order", "sprite", "sprite_palette", "color"], rows)
     print("Wrote %d items to %s" % (len(rows), dst))
 
     erows = []
@@ -481,7 +483,7 @@ _weapons = None
 
 
 def weapon_files():
-    """{sprite file stem: {"palette": asset, "items": [(label, colour)]}} for every weapon sprite."""
+    """{sprite file stem: {"palette": asset, "items": [(label, color)]}} for every weapon sprite."""
     global _weapons
     if _weapons is None:
         _weapons = {}
@@ -498,7 +500,7 @@ def weapon_files():
             pal = palette_asset(it["sprite_palette"])
             if asset_exists(pal):
                 w["pals"][pal] = w["pals"].get(pal, 0) + 1
-            w["items"].append((it["label"], it["colour"]))
+            w["items"].append((it["label"], it["color"]))
         for stem, w in list(_weapons.items()):
             if not w["pals"]:
                 if w["full"]:
@@ -506,7 +508,7 @@ def weapon_files():
                 else:
                     del _weapons[stem]
                 continue
-            # prefer the main palette file (most colours) over the _ex_pal one
+            # prefer the main palette file (most colors) over the _ex_pal one
             w["palette"] = max(w["pals"], key=lambda p: (len(osb.palettes(sprites.load(p))), w["pals"][p]))
     return _weapons
 
@@ -515,12 +517,12 @@ def sprite_palette(folder):
     """Palette 0 for a body (plN_cb00 -> Win/plN_pal.osb) or weapon sprite file, else None.
 
     Always the game's own palette, as exported: sprites are painted in the
-    original colours, and edited palettes then change what those become."""
+    original colors, and edited palettes then change what those become."""
     if folder in weapon_files():
         w = weapon_files()[folder]
-        return None if w["full"] else palettes.colours(sprites.load(w["palette"]))[0]
+        return None if w["full"] else palettes.colors(sprites.load(w["palette"]))[0]
     m = re.match(r"pl(\d)_cb\d\d$", folder)
-    return palettes.colours(sprites.load("Win/pl%s_pal.osb" % m.group(1)))[0] if m else None
+    return palettes.colors(sprites.load("Win/pl%s_pal.osb" % m.group(1)))[0] if m else None
 
 
 edited_palettes = {}  # asset -> palette file bytes made by build_palettes()
@@ -581,7 +583,7 @@ def build_palettes():
     return dict(edited_palettes)
 
 
-# full colour: class portraits, character-select illustrations, NPC and enemy faces
+# full color: class portraits, character-select illustrations, NPC and enemy faces
 ART_FILES = ["com_pl_icon", "s_o0a00", "s_o0200", "cutin00", "cp_o0000", "face", "EmFace"]
 
 
@@ -609,9 +611,9 @@ def export_sprites(weapons=False):
         for folder, w in sorted(weapon_files().items()):
             total += _export(folder)
             rows.append([folder, w["palette"][4:-4], len(w["items"]),
-                         "; ".join("%s (%s, colour %d)" % (names.get(l, ""), l, c) for l, c in w["items"])])
+                         "; ".join("%s (%s, color %d)" % (names.get(l, ""), l, c) for l, c in w["items"])])
         dst = os.path.join(MOD, "sprites_original", "weapons.csv")
-        write_csv(dst, ["sprite", "sprite_palette", "items", "used by (name, label, colour)"], rows)
+        write_csv(dst, ["sprite", "sprite_palette", "items", "used by (name, label, color)"], rows)
         print("Wrote the list of weapon sprites and the items using them to %s" % dst)
     print("Copy the frames you want to change into mod\\sprites\\<same folder>, edit them, then run Build mod.")
     return total
@@ -620,7 +622,7 @@ def export_sprites(weapons=False):
 REPLACE_TXT = "_replace.txt"  # in a sprite folder: its frames replace whole pictures
 
 
-TRACKS_TXT = "_tracks.txt"  # in a sprite folder: animation values to set (e.g. an effect's light colour)
+TRACKS_TXT = "_tracks.txt"  # in a sprite folder: animation values to set (e.g. an effect's light color)
 
 
 def apply_tracks(b, path, where):
@@ -832,7 +834,7 @@ def apply_offsets(b, path, where):
 def apply_hitboxes(b, path, where):
     """_hitboxes.txt lines, '#' comments:
         m<mesh> attack <x> <y> <w> <h> <kind>   the frame picture's attack boxes become this one box
-                                                (centre x, centre y up from the feet, size, kind)
+                                                (center x, center y up from the feet, size, kind)
         m<mesh> attack none                     the frame picture deals no hit
         m<mesh> attack <x y w h kind> <x y w h kind> ...
                                                 several boxes (at most as many as the picture has)
@@ -885,9 +887,9 @@ def apply_hitboxes(b, path, where):
 
 
 def class_palette_for(folder):
-    """(palette name, colour row 0) of the class in classes.csv whose body is this sprite
+    """(palette name, color row 0) of the class in classes.csv whose body is this sprite
     folder and whose palette this mod makes, else None. A new class's body is then painted
-    in its own colours: its palette can hold colours the base class never used."""
+    in its own colors: its palette can hold colors the base class never used."""
     path = os.path.join(MOD, "classes.csv")
     if not os.path.exists(path):
         return None
@@ -897,7 +899,7 @@ def class_palette_for(folder):
         name = row.get("palette", "").strip()
         b = edited_palettes.get("Win/%s.osb" % name)
         if b:
-            return name, palettes.colours(b)[0]
+            return name, palettes.colors(b)[0]
     return None
 
 
@@ -938,16 +940,16 @@ def build_sprites():
         pal = None if full else sprite_palette(base)
         own = None if full else class_palette_for(folder)
         if own and pngs:
-            print("  colours are matched to %s (the palette of the class using this body)" % own[0])
+            print("  colors are matched to %s (the palette of the class using this body)" % own[0])
             pal = own[1]
         replace = os.path.exists(os.path.join(path, REPLACE_TXT))
         if pal is None and not full:
             problem(where, "%s uses a palette Build mod doesn't know; class bodies (pl0_cb00), weapons "
-                           "(pl0_cw00) and full-colour pictures (com_pl_icon) can be edited" % base)
+                           "(pl0_cw00) and full-color pictures (com_pl_icon) can be edited" % base)
             continue
         print("%s %s%s%s ..." % ("Importing %d frame(s) into" % len(pngs) if pngs else "Changing", asset,
                                                          "" if base == folder else " (new, from %s)" % base,
-                                                         " (full colour)" if full else ""))
+                                                         " (full color)" if full else ""))
         if replace and pngs:
             print("  %s: each frame here replaces its whole picture (own tiles, nothing shared)" % REPLACE_TXT)
         new = sprites.import_frames(b, pngs, pal, report=lambda m: print("  note: " + m),
@@ -1180,7 +1182,7 @@ def apply_classes(defs, sprite_files, tables):
         for i, line in enumerate(lines):
             if bf.get(int(line.split()[0])):
                 lines[i] = line + " barface=1"
-    # the "empty" picture (the game's grey "no element" dash) for every class picture spot
+    # the "empty" picture (the game's gray "no element" dash) for every class picture spot
     for asset, names in EMPTY_PICTURES:
         try:
             sprite_files[asset] = selectart.add_empties(sprite_files.get(asset) or sprites.load(asset), names,
@@ -1305,8 +1307,8 @@ def mod_info():
     if not os.path.exists(path):
         with open(path, "w", encoding="utf-8") as f:
             f.write("; About this mod. folder = its folder in the game's mods folder (letters, digits, _ and -).\n"
-                    "; license = the licence you share the mod under, e.g. CC BY 4.0 or MIT (optional; the\n"
-                    "; Mod Manager shows it). Your mod is yours: the kit's own licence doesn't cover it.\n"
+                    "; license = the license you share the mod under, e.g. CC BY 4.0 or MIT (optional; the\n"
+                    "; Mod Manager shows it). Your mod is yours: the kit's own license doesn't cover it.\n"
                     "[mod]\nname=My Mod\nversion=1.0\nauthor=\ndescription=\nlicense=\nfolder=MyMod\n")
         print("Wrote mod\\mod.ini: set your mod's name there.")
     import configparser

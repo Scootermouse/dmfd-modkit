@@ -9,14 +9,14 @@ Written 2026-11-04, after items, icons, chests and sprite editing were working. 
 | Part | Where it lives | Status |
 |---|---|---|
 | Body art: 128 animations, about 580 frames (Empress) | `Win/plN_cb00.osb` | Decoded. Frames can be redrawn, including outside the old outline (new tiles; confirmed in-game). |
-| Colours: 6 contract elements (dragon arm) × 8 highlight colours = 48 palettes | `Win/plN_pal.osb` | Editable now (swatch pictures in `mod\palettes`), including new palette files; confirmed in-game. Adding extra schemes isn't possible yet. |
-| Weapon art | `Win/plN_cwXX.osb` (+ `_pal`, `_ex_pal`), named by the weapon item records | Editable now; new weapon sprite files work, picked per item (`sprite`, `colour` in items.csv; confirmed in-game). |
+| Colors: 6 contract elements (dragon arm) × 8 highlight colors = 48 palettes | `Win/plN_pal.osb` | Editable now (swatch pictures in `mod\palettes`), including new palette files; confirmed in-game. Adding extra schemes isn't possible yet. |
+| Weapon art | `Win/plN_cwXX.osb` (+ `_pal`, `_ex_pal`), named by the weapon item records | Editable now; new weapon sprite files work, picked per item (`sprite`, `color` in items.csv; confirmed in-game). |
 | Effects, dragon form | `Win/plN_efXX.osb`, `Win/plN0dc.osb` | Same format. |
 | Portraits, class-select art, HUD icons | `com_pl_icon` (menu portraits), `cp_o0000` (HUD portraits), `cutin00` (dragon orb cut-in) | Portraits, cut-in and character-select art (`s_o0a00`) editable and confirmed in-game. A 7th select panel needs the screen's part layout and menu code (not decoded). |
 | Names, descriptions, class-select text | `sys_plselect.tb2` (`PL04_INFO`…), `TalkerName.tb2` | Editable now (`text.csv`). |
 | Weapons and items | built-in item table (equip mask bit per class; 16 bits, 6 used) | Editable now (`items.csv`); new weapons and icons work. |
 | Voices: 8 voice sets per class (`VOICE_EMP_A`…`H`) | sound banks in DataHash | **Not decoded** (unknown codec). |
-| Behaviour: moves, attacks, skills, dragon form, magic | **game code**: `cPlWork00`–`05`, each a C++ class with ~173 virtual methods and 25–73 action routines of its own (`coActionSlashX`, `coAttackJumpShot`, `coActionDragonBoost`…), plus ~50 shared ones and attack objects (`cPshWork`) | Not modified yet; the rebalance mod already hooks some combat code. |
+| Behavior: moves, attacks, skills, dragon form, magic | **game code**: `cPlWork00`–`05`, each a C++ class with ~173 virtual methods and 25–73 action routines of its own (`coActionSlashX`, `coAttackJumpShot`, `coActionDragonBoost`…), plus ~50 shared ones and attack objects (`cPshWork`) | Not modified yet; the rebalance mod already hooks some combat code. |
 | Being a class at all | engine type registry (`MyDTI@cPlWork0N`), class-number checks hard-coded to 0–5 (e.g. the availability switch at `0xC92540`), character creation with 6 slots, per-class save data | Not looked at in depth. |
 
 ## Three levels of "custom class"

@@ -1,5 +1,12 @@
 # Changelog
 
+## Not released yet
+
+- **American spelling, as the game uses:** color, gray, center, armor and so on, in the docs, tools
+  and Mod Manager. The `items.csv` column is now `color`; `colour` still works, and so do mods
+  built with older tools.
+- Docs: the Bandit is "he" (one line called him "her").
+
 ## 0.10 (2026-11-25): custom weapons
 
 Everything a custom weapon needs, worked out and checked in the game. A step-by-step guide:
@@ -22,7 +29,7 @@ docs/weapon-example.md.
 - **Effect Tweaks 0.2.2** (new code mod for modders, on the mod list): shift, delay, speed up, start
   later in or swap any effect, from `effects.txt`.
 - **Fixed:** at the inn, paging between an extra class and the class it borrows from showed the old
-  body under the new colours.
+  body under the new colors.
 - The modding tools zip now includes the name lists the tools read (`anim_names.txt`, `names.txt`).
 
 ## 0.9 (2026-11-23): first public release

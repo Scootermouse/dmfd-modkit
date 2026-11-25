@@ -88,9 +88,9 @@ Input goes through the game's own actions, so any controller works (as our rules
 - The set-up points the shot at its **attack table** (shot+0x36C, entries at +0x60, count +0x68),
   adds a **hit box**, and loads its picture **`pl0_ef00.osb`** (string 0x110E680, by
   `0xE093C0`).
-- **Sprite:** animation **炎** (flipbook meshes 5–9 plus a glow node, colour 1/0.58/0.2) in
-  `Win/pl0_ef00.osb` (1024×1024 full colour, 87 animations). On a hit it plays 炎_破裂, at the end
-  of its life 炎_消滅. **Data:** replaceable with Build mod (full-colour import works).
+- **Sprite:** animation **炎** (flipbook meshes 5–9 plus a glow node, color 1/0.58/0.2) in
+  `Win/pl0_ef00.osb` (1024×1024 full color, 87 animations). On a hit it plays 炎_破裂, at the end
+  of its life 炎_消滅. **Data:** replaceable with Build mod (full-color import works).
 - **Speed:** 12 px per frame forward (`coActionFireNormal`), vertical drift by shot number
   `0x110E248` = {0, +0.5, −0.5} px/frame (the 3-way fan), tilted 20° for the diagonal pose.
 - **Lifetime:** 40 frames (≈ 480 px of travel), then it fades (`coActionFire_Move` 0xD36550).
@@ -230,7 +230,7 @@ A test class that borrows the Empress's moves, with its own art and a code mod, 
 
 - **Body hit boxes are sprite data, per frame picture** (*confirmed in game*). The table at
   header +0x28 of a body `.osb` lists, per frame mesh, attack boxes then hurt boxes (5 int32 each:
-  centre x, centre y up from the feet, width, height, kind; kind 0 = body, 10/11 on the
+  center x, center y up from the feet, width, height, kind; kind 0 = body, 10/11 on the
   Empress's sword strike). The game's collision uses the boxes of the picture being shown, so a
   class with its own body file gets its own hit boxes. Build mod: `_hitboxes.txt` (FORMAT.md).
   Shots are different: their box is a code constant (section 1.5).
@@ -242,7 +242,7 @@ A test class that borrows the Empress's moves, with its own art and a code mod, 
   with the class through a hook on 0xD62D30.
 - **The fireball's look has three parts** (*confirmed in game*): animation 炎 (52 frames, pictures
   5–9 then a loop of 9–16), a node showing another animation of the same file (index 72, a big
-  orange glow at 30 % opacity) and a light node coloured by track channels 10–12 (red/green/blue,
+  orange glow at 30 % opacity) and a light node colored by track channels 10–12 (red/green/blue,
   0..1; Build mod `_tracks.txt`). The fiery burst on hit comes from the attack entry's element
   (+0x04), not from the picture.
 - **The shot mover** is 0xD36550 (state block at stack+0x10: +0x14 life, +0x18 fan time, +0x1C

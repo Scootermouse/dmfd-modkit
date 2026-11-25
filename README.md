@@ -27,7 +27,7 @@ the game's own files.
 **For modders** (the modding tools: Mod Manager → Build a mod → Get the modding tools; they bring
 their own Python)
 - Items (change and add), treasure chests, any game text, item icons (redraw and add).
-- Every sprite: class bodies, weapons, portraits, menus, the HUD; palettes (colour schemes).
+- Every sprite: class bodies, weapons, portraits, menus, the HUD; palettes (color schemes).
 - **Extra classes**: up to 127 in all, on extra pages of character select, each with its own
   name, body, palette, pictures and saved characters, using one of the six classes' moves.
 - Body animations: whole new frames, new timing, and new hit boxes per frame.
@@ -133,15 +133,15 @@ that comes with them; no downloads.
 Each script's `install` option copies the result into the game folder: set `DMFD_GAME` to the
 game folder if it isn't Steam's default.
 
-## Licence and credits
+## License and credits
 
 - The kit (loader, Mod Manager, tools) is free software under the **GNU GPL, version 3 or later**
   ([LICENSE](LICENSE)).
-- The code mod API in `codemods/common` is **MIT** licensed, so mods can use any licence. Each mod
+- The code mod API in `codemods/common` is **MIT** licensed, so mods can use any license. Each mod
   belongs to its maker (see its `mod.ini`).
 - [MinHook](https://github.com/TsudaKageyu/minhook) (BSD 2-clause) and
   [Dear ImGui](https://github.com/ocornut/imgui) 1.91.9 (MIT) are included in `third_party/` with
-  their licences.
+  their licenses.
 - The Mod Manager's layout and several features were inspired by UE Mod Manager by KintaroModding.
 - Dragon Marked for Death is © Inti Creates. This kit is not made or endorsed by Inti Creates, and
   it contains none of the game's files or art: everything it changes is made on your own machine

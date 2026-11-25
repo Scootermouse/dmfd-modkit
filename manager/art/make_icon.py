@@ -49,7 +49,7 @@ def crop_square(w, h, px, margin=0.06):
 
 
 def shrink(side, px, n):
-    """Area-average resize side x side -> n x n (colour weighted by alpha)."""
+    """Area-average resize side x side -> n x n (color weighted by alpha)."""
     out = bytearray(n * n * 4)
     scale = side / n
     for y in range(n):
@@ -84,7 +84,7 @@ def shrink(side, px, n):
 def main():
     w, h, px = osb.read_png_rgba(os.path.join(HERE, "icon_source.png"))
     px = bytearray(px)
-    for y in range(h):  # the source's last two columns are a grey screenshot edge, not the drawing
+    for y in range(h):  # the source's last two columns are a gray screenshot edge, not the drawing
         for x in range(w - 2, w):
             px[4 * (y * w + x):4 * (y * w + x) + 4] = bytes(4)
     # keep the black background (it reads better on any desktop); only find the D for cropping

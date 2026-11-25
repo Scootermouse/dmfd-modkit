@@ -2,14 +2,14 @@
 
 A palette file is an osb holding one palette block:
     u32 hash, -1, -1, 0x34, 0x14, 4, 0, nPal, 0, nCol, 0x34, nPal', 0x34 + nPal*nCol*4
-then nPal palettes of nCol colours, stored BGRA (colour 0 is transparent), then
-a small tree naming the palettes. Edits keep the counts, so only colours change.
+then nPal palettes of nCol colors, stored BGRA (color 0 is transparent), then
+a small tree naming the palettes. Edits keep the counts, so only colors change.
 
-The PNG is a grid: one row per palette (colour scheme), one square per colour,
-CELL pixels apart; the colour is read from the middle of each square.
+The PNG is a grid: one row per palette (color scheme), one square per color,
+CELL pixels apart; the color is read from the middle of each square.
 
-Body palettes (plN_pal) hold 48 schemes = 8 highlight colours x 6 contract
-elements, row = highlight * 6 + element. Most colours are the same in every
+Body palettes (plN_pal) hold 48 schemes = 8 highlight colors x 6 contract
+elements, row = highlight * 6 + element. Most colors are the same in every
 row; for those, changing the first row changes all rows (unless other rows
 were edited too).
 """
@@ -18,12 +18,12 @@ import struct
 
 import osb
 
-CELL, SWATCH = 12, 11      # 11x11 colour squares on a 12-pixel grid
-GAP = b"\x50\x50\x50\xff"  # grid line colour
+CELL, SWATCH = 12, 11      # 11x11 color squares on a 12-pixel grid
+GAP = b"\x50\x50\x50\xff"  # grid line color
 
 
 def find_block(b):
-    """-> (offset of the colour data, nPal, nCol) of the palette block."""
+    """-> (offset of the color data, nPal, nCol) of the palette block."""
     o = 0
     while True:
         o = b.find(b"\xff" * 8, o)
@@ -36,7 +36,7 @@ def find_block(b):
         o += 1  # byte by byte: the ID just before the marker can end in 0xFF too
 
 
-def colours(b):
+def colors(b):
     """-> list of rows, each a list of RGBA bytes."""
     base, npal, ncol = find_block(b)
     out = []
@@ -48,7 +48,7 @@ def colours(b):
 
 
 def export_png(b, path):
-    rows = colours(b)
+    rows = colors(b)
     ncol = len(rows[0])
     W, H = ncol * CELL + 1, len(rows) * CELL + 1
     img = bytearray(GAP * (W * H))
@@ -65,7 +65,7 @@ def read_png(path, npal, ncol):
     """-> rows of RGBA from a swatch PNG, or raise ValueError if the grid size is wrong."""
     W, H, img = osb.read_png_rgba(path)
     if (W, H) != (ncol * CELL + 1, npal * CELL + 1):
-        raise ValueError("picture is %dx%d; this palette file needs %dx%d (%d schemes x %d colours). "
+        raise ValueError("picture is %dx%d; this palette file needs %dx%d (%d schemes x %d colors). "
                          "Don't resize it." % (W, H, ncol * CELL + 1, npal * CELL + 1, npal, ncol))
     mid = 1 + SWATCH // 2
     out = []
@@ -90,7 +90,7 @@ def osp_id(sprite):
     """The palette ID the game looks for with a sprite: the hash of "<sprite>.osp".
 
     pl0_cb00.osp = the Empress's palette, pl0_cw00.osp = the starting sword's,
-    pl5_pal.osp = the Bandit's (her only exception). While drawing, the game finds a
+    pl5_pal.osp = the Bandit's (his only exception). While drawing, the game finds a
     class's palette by the hash of the palette file name plus this ID (0xD66730)."""
     return ice(re.sub(r"\.osb$", "", sprite) + ".osp")
 
@@ -118,7 +118,7 @@ def set_id(b, name, base_name=None, sprite=None):
 def import_png(b, path, report=print):
     """-> edited palette file bytes, or None when nothing changed."""
     base, npal, ncol = find_block(b)
-    old = colours(b)
+    old = colors(b)
     new = [list(r) for r in read_png(path, npal, ncol)]
     spread = 0
     for c in range(ncol):
@@ -129,7 +129,7 @@ def import_png(b, path, report=print):
                 new[r][c] = new[0][c]
             spread += 1
     if spread:
-        report("palettes: %d colour(s) changed in the first row, applied to all %d rows" % (spread, npal))
+        report("palettes: %d color(s) changed in the first row, applied to all %d rows" % (spread, npal))
     if new == old:
         return None
     out = bytearray(b)
@@ -141,5 +141,5 @@ def import_png(b, path, report=print):
                 q = base + (r * ncol + c) * 4
                 out[q:q + 4] = bytes((B, G, R, A))
                 changed += 1
-    report("palettes: %d colour(s) changed" % changed)
+    report("palettes: %d color(s) changed" % changed)
     return bytes(out)

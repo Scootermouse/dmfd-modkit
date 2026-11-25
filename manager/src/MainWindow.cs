@@ -130,7 +130,7 @@ namespace DmfdManager
             {
                 var img = new Image { Source = Load(hero), Height = 360, Stretch = Stretch.UniformToFill, HorizontalAlignment = HorizontalAlignment.Right, VerticalAlignment = VerticalAlignment.Top, Opacity = 0.9 };
                 // fades out at its left and bottom edges (no hard line on a wide window): background-
-                // coloured fades laid over the picture, sized by what's shown (an opacity mask is
+                // colored fades laid over the picture, sized by what's shown (an opacity mask is
                 // sized by the whole picture, which can be wider than what's shown)
                 var holder = new Grid { Height = 360, VerticalAlignment = VerticalAlignment.Top, HorizontalAlignment = HorizontalAlignment.Right, MaxWidth = 1115, ClipToBounds = true };
                 heroImg = img;
@@ -141,7 +141,7 @@ namespace DmfdManager
                 leftFade.GradientStops.Add(new GradientStop(Theme.C("#00120b0d"), 0.55));
                 holder.Children.Add(new Border { Background = leftFade });
                 var bottomFade = new LinearGradientBrush { StartPoint = new Point(0, 0), EndPoint = new Point(0, 1) };
-                // fade from the background colour made transparent: WPF's Transparent is transparent
+                // fade from the background color made transparent: WPF's Transparent is transparent
                 // WHITE, which made a light band halfway down
                 bottomFade.GradientStops.Add(new GradientStop(Theme.C("#00120b0d"), 0.45));
                 bottomFade.GradientStops.Add(new GradientStop(Theme.C("#120b0d"), 1));
@@ -191,7 +191,7 @@ namespace DmfdManager
         }
 
         // Keep the page's intro text left of the header art's busy part (the art's left ~44% is
-        // plain red, then the characters start). The picture is 360 high and centred when its
+        // plain red, then the characters start). The picture is 360 high and centered when its
         // holder is narrower than it, so where that edge lands depends on the window's size.
         const double ArtBusyFrom = 0.44;
 
@@ -202,7 +202,7 @@ namespace DmfdManager
             var src = heroImg.Source as BitmapSource;
             if (src == null || heroHolder.ActualWidth <= 0 || intro.ActualWidth <= 0) return;
             double drawnW = 360.0 * src.PixelWidth / src.PixelHeight;          // the picture's width as drawn
-            double left = (heroHolder.ActualWidth - drawnW) / 2;                // centred in its holder (<= 0 when cropped)
+            double left = (heroHolder.ActualWidth - drawnW) / 2;                // centered in its holder (<= 0 when cropped)
             if (heroHolder.ActualWidth >= drawnW) left = heroHolder.ActualWidth - drawnW;
             double busy = heroHolder.TranslatePoint(new Point(left + ArtBusyFrom * drawnW, 0), mainArea).X;
             double textLeft = intro.TranslatePoint(new Point(0, 0), mainArea).X;
@@ -1346,13 +1346,13 @@ namespace DmfdManager
                 Ui.T("Dragon Marked for Death © INTI CREATES CO., LTD. All rights reserved. The game, its name, characters, art, music and logo belong to Inti Creates.", 14, Theme.Muted),
                 Ui.Gap(8),
                 Ui.T("This kit is not made, endorsed or supported by Inti Creates. It needs your own copy of the game and changes nothing in the game's own files; the game's art shown here is read from your own Steam library. Steam is a trademark of Valve Corporation.", 14, Theme.Muted))));
-            s.Children.Add(Ui.Card(Ui.Stack(Ui.H("Licence"),
-                Ui.T("The mod kit is free software under the GNU General Public License, version 3 or later: you may share it and change it, and versions you share must stay free under the same licence, with their source. It comes with no warranty. The full text is in LICENSE, next to the kit's source.", 14, Theme.Muted),
+            s.Children.Add(Ui.Card(Ui.Stack(Ui.H("License"),
+                Ui.T("The mod kit is free software under the GNU General Public License, version 3 or later: you may share it and change it, and versions you share must stay free under the same license, with their source. It comes with no warranty. The full text is in LICENSE, next to the kit's source.", 14, Theme.Muted),
                 Ui.Gap(8),
-                Ui.T("Mods made for the kit belong to the people who make them, who choose their own licence (a mod's mod.ini can name it, and it shows on the Mods page). The small mod API that code mods build on is MIT-licensed, so any licence works for them.", 14, Theme.Muted))));
+                Ui.T("Mods made for the kit belong to the people who make them, who choose their own license (a mod's mod.ini can name it, and it shows on the Mods page). The small mod API that code mods build on is MIT-licensed, so any license works for them.", 14, Theme.Muted))));
             s.Children.Add(Ui.Card(Ui.Stack(Ui.H("Open-source parts"),
-                Ui.T("Dear ImGui © Omar Cornut (MIT licence): the in-game menu.", 14, Theme.Muted),
-                Ui.T("MinHook © Tsuda Kageyu (BSD 2-clause licence): changing the game's code while it runs.", 14, Theme.Muted))));
+                Ui.T("Dear ImGui © Omar Cornut (MIT license): the in-game menu.", 14, Theme.Muted),
+                Ui.T("MinHook © Tsuda Kageyu (BSD 2-clause license): changing the game's code while it runs.", 14, Theme.Muted))));
             return s;
         }
 

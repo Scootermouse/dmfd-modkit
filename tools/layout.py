@@ -4,7 +4,7 @@ Menu screens (e.g. Win/s_o0a00.osb, the character select screen) are
 animations whose child nodes are named parts (PL1..PL6 = class panels,
 PL1_Lv.. = their level labels, bg, cursor...). Each node has tracks:
     channel 0 = picture (mesh number), 1/2 = scale x/y, 7/8 = position x/y
-(screen units, y up, origin at the screen centre; see FORMAT.md).
+(screen units, y up, origin at the screen center; see FORMAT.md).
 Keys are 20 bytes {f32 time, ?, value, ?, ?}; value is a u32 for channel 0
 and an f32 otherwise. Edits overwrite every key of a track, in place.
 
