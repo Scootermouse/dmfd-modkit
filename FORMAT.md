@@ -335,7 +335,7 @@ All of these were worked out in November 2026 while building a test class with i
   quad corners are relative to the character's feet (x forward, y up: the Empress's idle body spans
   y -6..66). The Warrior's body has no child nodes at all; position tracks (7/8) on body nodes are
   effect attach points (Empress `Wire`, Shinobi and Oracle effect parts). `move_picture` shifts a
-  picture's corners; Build mod's `_offsets.txt` uses it (*read from the files*).
+  picture's corners; Build mod's `_offsets.txt` uses it (*confirmed in game: the Empress's idle sword moved up 40 px*).
 
 Still not possible: brand-new animations (entries) and new hit-box records beyond taking over a donor's.
 

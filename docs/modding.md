@@ -199,7 +199,7 @@ with `#` are comments.
   in the Empress's idle (`待機`). Every item using that weapon file changes; for one new weapon only,
   copy the folder under a new name first (Weapon sprites). Body nodes with positions
   (channels 7/8, see `_tracks.txt`) are effect attach points such as the Empress's tether, not
-  weapons. (*Read from the files; in-game test pending.*)
+  weapons. (*Confirmed in game: the Empress's sword 40 px higher in her idle.*)
 - **`_tracks.txt`**: other animation values (*confirmed in game* for light colours):
   `<animation name or 0xhash> <node 0xhash> <channel> <value>` sets every key of that track, e.g.
   an effect's light colour (channels 10/11/12 = red/green/blue, 0 to 1).
