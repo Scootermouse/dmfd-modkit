@@ -235,7 +235,7 @@ known.
 
 **Effect Tweaks** (a code mod, `codemods/EffectTweaks`) changes how effects play, from
 `mods\EffectTweaks\effects.txt`, one effect a line:
-`<animation> swap=<animation> start=<frames> dx=<pixels> dy=<pixels>`.
+`<animation> swap=<animation> start=<frames> dx=<pixels> dy=<pixels> delay=<frames> speed=<x>`.
 - `<animation>` is `0x<name hash>` or the animation's name. To find an effect's hash, tick "Log
   animations as they start" on the mod's page in the in-game menu, do the move, and read the new
   lines in `mods\EffectTweaks\mod.log` (each animation is logged once, with the game code that
@@ -246,8 +246,12 @@ known.
 - `dx=`/`dy=` shift it forward (as drawn facing right) and up. This works for effects attached to
   the character (*confirmed in game: the Empress's walking-slash trail 30 px higher*); a shot's own
   picture ignores it (it is placed at the shot every frame; *seen in game with her fireball*).
+- `delay=` waits that many frames (60 a second) before the effect plays; it's kept out of sight
+  and paused meanwhile. `speed=` plays it faster or slower (0.5 = half speed). (*Both confirmed in
+  game on the Empress's walking-slash trail.*)
+- Some moves wait for their effect to finish (the Empress's walking slash does): a delay or a
+  slower speed holds the move up by as long.
 - "Reload effects.txt" in the menu applies changes without restarting.
-- Not yet: delaying an effect or changing its playback speed (the trigger moment stays the move's).
 
 Every class's effects go through the same engine call, so this works for all of them.
 

@@ -1,7 +1,12 @@
 # Effect Tweaks: one effect a line; "#" starts a comment.
-#   <animation> swap=<animation> start=<frames> dx=<pixels> dy=<pixels>
+#   <animation> swap=<animation> start=<frames> dx=<pixels> dy=<pixels> delay=<frames> speed=<x>
 # <animation> is 0x<name hash> (tools\anim_names.py, or "Log animations as they start" in the
 # Effect Tweaks menu, which writes each one to mods\EffectTweaks\mod.log) or the animation name.
-# swap: play that animation of the same file instead. start: begin that many frames in.
-# dx is forward (as drawn facing right), dy is up. Example:
-# 0x12345678 start=2 dy=20
+# swap:  play that animation of the same file instead.
+# start: begin that many frames in.
+# dx/dy: shift it forward (as drawn facing right) / up; effects attached to the character only.
+# delay: wait that many frames (60 a second), hidden, before it plays.
+# speed: play it faster or slower (0.5 = half speed, 2 = double).
+# A move that waits for its effect (e.g. the Empress's walking slash) waits longer with delay or a
+# slower speed. Example:
+# 0x12345678 start=2 dy=20 delay=6 speed=0.8

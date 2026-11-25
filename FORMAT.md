@@ -345,6 +345,12 @@ All of these were worked out in November 2026 while building a test class with i
 - **Hurt boxes** are the second `{count, offset}` pair of a picture's hit-box entry (attack first);
   the Empress's idle body box is (0, 28, 32, 56, kind 0). `set_attack_box(..., which=1)` writes them
   (*confirmed in game*: with none on her idle pictures nothing hit her while she stood still).
+- **Sprite playback** (the per-frame update 0xE4EE80): nothing when +1A2h (removed) is set; the
+  step is the frame time x the rate of the sprite's root node (sprite +40h; 0xE51FB0: its own
+  speed at node +E4h = sprite +124h, 1.0, x its parent's when node +ECh has bit 40h); +1A0h = 0
+  pauses it. An effect's offset from its parent is sprite +78h/+7Ch. Every animation start goes
+  through 0xE4EA70 (sprite, hash, parent, int, float start time), which Effect Tweaks hooks
+  (*confirmed in game*).
 - **Animation names** for the class bodies, weapons and effects are listed in `tools/anim_names.txt`
   (hash, name; 503 names covering 2,579 of 4,535 animations, matched against the strings of the
   unpacked program); `tools/anim_names.py` lists a file's animations with them.
