@@ -351,6 +351,12 @@ All of these were worked out in November 2026 while building a test class with i
   pauses it. An effect's offset from its parent is sprite +78h/+7Ch. Every animation start goes
   through 0xE4EA70 (sprite, hash, parent, int, float start time), which Effect Tweaks hooks
   (*confirmed in game*).
+- **Where a swing's hit comes from** (*confirmed in game*): the Empress's normal sword combo has no
+  attack boxes on her body or weapon pictures; the effect file `pl0_ef00` has an animation with the
+  same name as each slash (started with the body through 0xD68A40, like the weapon), whose pictures
+  carry the attack boxes (kinds 1/2/3 per combo hit). The collision reports the player as the
+  attacker. Projectiles take a constant box from the exe instead (`0x986950` pushes it; e.g. the
+  fireball's `{-8, 0, 52, 28}` at 0x1122940). `set_boxes` writes several boxes over a picture's own.
 - **Animation names** for the class bodies, weapons and effects are listed in `tools/anim_names.txt`
   (hash, name; 503 names covering 2,579 of 4,535 animations, matched against the strings of the
   unpacked program); `tools/anim_names.py` lists a file's animations with them.

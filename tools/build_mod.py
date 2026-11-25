@@ -834,6 +834,8 @@ def apply_hitboxes(b, path, where):
         m<mesh> attack <x> <y> <w> <h> <kind>   the frame picture's attack boxes become this one box
                                                 (centre x, centre y up from the feet, size, kind)
         m<mesh> attack none                     the frame picture deals no hit
+        m<mesh> attack <x y w h kind> <x y w h kind> ...
+                                                several boxes (at most as many as the picture has)
         m<mesh> hurt ...                        the same for its hurt boxes (where it can be hit)
     a<n> or 0x<hash> in place of m<mesh>: every picture of that animation.
         m<mesh> attack <x> <y> <w> <h> <kind> from m<donor>
@@ -860,6 +862,15 @@ def apply_hitboxes(b, path, where):
             if len(parts) >= 9 and parts[7].lower() == "from":
                 donor = int(parts[8].lstrip("mM"))
                 parts = parts[:7]
+            if parts[2].lower() != "none" and donor is None and len(parts) > 7:
+                nums = [int(x) for x in parts[2:]]
+                if len(nums) % 5:
+                    raise ValueError("boxes are groups of 5: x y w h kind")
+                boxes = [tuple(nums[i:i + 5]) for i in range(0, len(nums), 5)]
+                for mesh in meshes:
+                    out = sprites.set_boxes(out, mesh, boxes, which)
+                    done += 1
+                continue
             box = None if parts[2].lower() == "none" else tuple(int(x) for x in parts[2:7])
             if box is not None and len(box) != 5:
                 raise ValueError("a box is x y w h kind")

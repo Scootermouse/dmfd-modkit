@@ -615,6 +615,21 @@ def warp_timing(b, index, old_times, old_len, new_times, new_len):
     return bytes(out)
 
 
+def set_boxes(b, mesh, boxes, which=0):
+    """Sets a frame mesh's attack (which=0) or hurt (which=1) boxes to several (x, y, w, h, kind)
+    at once, written over its existing records: it can have at most as many as it has now (the
+    file has no room for more). -> new bytes."""
+    e = hitbox_table(b) + 16 * mesh + 8 * which
+    n, o = struct.unpack_from("<II", b, e)
+    if len(boxes) > n:
+        raise ValueError("picture m%d has %d %s box(es); %d given (can't add more)" % (mesh, n, ("attack", "hurt")[which], len(boxes)))
+    out = bytearray(b)
+    for i, box in enumerate(boxes):
+        struct.pack_into("<5i", out, o + 20 * i, *box)
+    struct.pack_into("<I", out, e, len(boxes))
+    return bytes(out)
+
+
 def set_node_count(b, index, n):
     """Keeps only the first n nodes (blocks) of animation index: the entry's block count is
     lowered, the dropped blocks stay in the file unused. E.g. the Empress's tether animations

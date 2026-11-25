@@ -196,6 +196,18 @@ with `#` are comments.
     be hit), e.g. the Empress's idle body box is `0 28 32 56 0` (*confirmed in game: with
     `0x67d7af17 hurt none` nothing hit her while she stood idle, and she was hit as usual otherwise*).
   - `a<n>` or `0x<hash>` in place of `m<mesh>`: the line applies to every picture of that animation.
+  - `m<mesh> attack <x y w h kind> <x y w h kind> ...`: several boxes at once, written over the
+    picture's own; at most as many as it already has (the file has no room for more).
+  - **Reach of a class's normal attacks is in its effect file** (*confirmed in game*). A sword
+    swing's hits come from the slash effect that plays with it: the class's effect file (`plN_ef00`)
+    has an animation of the same name as the body's (e.g. `剣_通常２段（斬り）`), started together
+    with the body and the weapon, and its pictures carry the attack boxes (the Empress's combo hit 1:
+    three boxes up to about 80 px ahead; each hit has its own kind, 1, 2, 3). So to change how far a
+    swing reaches, put a `_hitboxes.txt` in `sprites\pl0_ef00\` (or the class's own effect folder),
+    e.g. `0x984c24b9 attack 150 30 220 80 2` made the Empress's hit 2 reach about 260 px ahead. It is
+    per move for the whole class, not per weapon item (every weapon uses the same effect). The body's
+    own pictures carry boxes only for some moves (e.g. the Dragon Sword strike); weapon files carry
+    none.
 - **`_offsets.txt`**: move frame pictures, e.g. **where a weapon sits on each frame**. x is
   forward (as drawn facing right), y is up, in pixels.
   - `m<picture> <dx> <dy>`: move that frame picture (`m<number>` in its file name).
@@ -226,10 +238,11 @@ with `#` are comments.
   weapon folders), so a weapon of a quite different shape needn't be painted over the old one
   (*confirmed in game: the Empress's idle sword drawn as a ring*).
 
-**Swing trails and effects.** A normal sword swing's blur is the weapon's own picture for that
-frame (the weapon file), so it's edited and placed like the weapon. Added effects, such as the
-Empress's walking-slash trail or her fireball, come from the class's effect file (`plN_ef00`): their
-pictures can be redrawn like any sprite file, and the game's code decides when they start. Each
+**Swing trails and effects.** A sword swing has three parts playing the same animation name: the
+body, the weapon (its blurred blade) and a slash effect in the class's effect file (`plN_ef00`: the
+white arc, which also carries the swing's attack boxes, see `_hitboxes.txt`). Other effects, such as
+the Empress's walking-slash trail or her fireball, are started by the move's code from the same
+file. All of them can be redrawn like any sprite file. Each
 weapon file also has a couple of animations its body doesn't (2 in `pl0_cw00`), unused as far as
 known.
 
@@ -251,6 +264,8 @@ known.
   game on the Empress's walking-slash trail.*)
 - Some moves wait for their effect to finish (the Empress's walking slash does): a delay or a
   slower speed holds the move up by as long.
+- A swing's slash effect has the same animation name as the body's and the weapon's (see Swing
+  trails above), so a line for that name changes all three.
 - "Reload effects.txt" in the menu applies changes without restarting.
 
 Every class's effects go through the same engine call, so this works for all of them.
