@@ -852,6 +852,39 @@ __declspec(naked) static void h_bodyNames()
     }
 }
 
+// 0xAF6210 (thiscall(picture, class, weapon, ?, colour, element, weapon 2, scale), ret 0x1C)
+// draws a character picture (inn and bar status panels, the title select preview). It keeps
+// the class it last built at picture+0xC0 and rebuilds the body only when the class number
+// changes; the palette (0xD66C80) is bound every time. The inn's status panel passes a slot,
+// so turning a page from an Empress-based extra class to an Empress (both slot 0) kept the
+// extra class's body under the Empress palette, and back. When the class really drawn for that number changes, the
+// cached class is cleared so the body is built again.
+static const uint32_t PICTURE = 0xAF6210;
+using PictureFn = void(__fastcall*)(void*, void*, int, int, int, int, int, int, float);
+static PictureFn o_picture;
+static struct { void* pic; int drawn; } g_picDrawn[16];
+static void __fastcall h_picture(void* pic, void* edx, int cls, int a2, int a3, int a4, int a5, int a6, float a7)
+{
+    __try {
+        int drawn = cls >= 0 && cls < 6 && !g_rawBodies && !g_remoteHas[cls] ? g_bindMap[cls] : cls;
+        int i = 0, freeAt = -1;
+        for (; i < 16 && g_picDrawn[i].pic != pic; i++)
+            if (!g_picDrawn[i].pic && freeAt < 0) freeAt = i;
+        if (i < 16) {
+            if (g_picDrawn[i].drawn != drawn && *(int*)((uint8_t*)pic + 0xC0) == cls) {
+                if (g_logBinds) Log("picture %p: slot %d now draws class %d (was %d), body rebuilt", pic, cls, drawn,
+                                    g_picDrawn[i].drawn);
+                *(int*)((uint8_t*)pic + 0xC0) = -1;
+            }
+        } else {
+            i = freeAt >= 0 ? freeAt : (int)(((uintptr_t)pic >> 4) & 15);  // full: reuse an entry
+            g_picDrawn[i].pic = pic;
+        }
+        g_picDrawn[i].drawn = drawn;
+    } __except (EXCEPTION_EXECUTE_HANDLER) {}
+    o_picture(pic, edx, cls, a2, a3, a4, a5, a6, a7);
+}
+
 // Select-screen panels. The preview (0xAB8740) and the info box (0xAB90C0) take
 // a panel number; the HUD (0xABE2D0) takes the cursor. All thiscall, 1 arg, ret 4.
 // The preview gets the class really in that panel's slot; the info box shows
@@ -2355,7 +2388,9 @@ static bool PageHooks()
            HookAt(PAL_BIND, (void*)h_palBind, &o_palBind) && HookAt(SELECT_STEP, h_step, (void**)&o_step) &&
            HookAt(SEL_PREVIEW, h_preview, (void**)&o_preview) && HookAt(SEL_INFOBOX, h_infobox, (void**)&o_infobox) &&
            HookAt(SEL_HUD, h_hud, (void**)&o_hud) && HookAt(PAL_LOAD, h_palLoad, (void**)&o_palLoad) &&
-           HookAt(BODY_NAMES, h_bodyNames, &o_bodyNames) && CodeAt(GAME_ACTION, "558bec5180b994020000") &&
+           HookAt(BODY_NAMES, h_bodyNames, &o_bodyNames) &&
+           CodeAt(PICTURE, "558bec6aff68") && CodeAt(PICTURE + 0x1C1, "39bbc0000000") &&
+           HookAt(PICTURE, h_picture, (void**)&o_picture) && CodeAt(GAME_ACTION, "558bec5180b994020000") &&
            HookAt(GAME_ACTION, h_gameAction, (void**)&o_gameAction) &&
            HookAt(SET_ANIM, h_setAnim, (void**)&o_setAnim) && HookAt(PROMPTS, (void*)h_prompts, &o_prompts) &&
            HookAt(PLAY_SOUND, h_playSound, (void**)&o_playSound) && HookAt(INN_STEP, h_innStep, (void**)&o_innStep) &&
