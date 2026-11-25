@@ -656,6 +656,9 @@ static void __cdecl h_preloadLog(void* loader, uint8_t* block, int arg)
     bool raw = cls < 6 && FromSelectSetup(from) && RawBodies(true);
     g_preloadOrig[cls < MAX_CLASSES ? cls : 0](loader, block, arg);
     if (raw) RawBodies(false);
+    // its own effect / weapon files too, in the full (quest) preload only: added to the inn's light
+    // preload they mixed up its character preview
+    if (cls >= 6 && !arg) ClassFilesPreloaded(cls, loader);
 }
 using InfoFn = void(__fastcall*)(void*, void*, uint8_t*);
 static InfoFn o_info;
@@ -2117,6 +2120,12 @@ static void* __fastcall h_makeSprite(void* owner, void* edx, const char* file, i
             }
         } __except (EXCEPTION_EXECUTE_HANDLER) {}
     }
+    // an extra class's own effect / weapon file (classfiles.cpp); the original if it isn't loaded
+    if (const char* own = ClassFileFor(owner, file)) {
+        if (void* r = o_makeSprite(owner, edx, own, a, b)) return r;
+        static volatile LONG missing;
+        if (InterlockedIncrement(&missing) <= 5) Log("classes: %s isn't loaded; %s used", own, file);
+    }
     return o_makeSprite(owner, edx, file, a, b);
 }
 
@@ -2411,6 +2420,7 @@ bool ClassesInit()
         if (base < 0 || base > 5) base = 0;
         for (int t = 0; t < NTAB; t++) g_tab[t][cls] = g_tab[t][base];
         if (Field(padded, "body", v, sizeof v)) g_tab[BODY][cls] = (uintptr_t)Keep(v);
+        ClassFilesSetup(cls, base, (const char*)g_tab[BODY][cls]);  // its own effect / weapon files (classfiles.cpp)
         if (Field(padded, "palette", v, sizeof v)) g_tab[PAL][cls] = (uintptr_t)Keep(v);
         // its own pause-menu sheets (sub_quest_13xx, sub_status_13xx). NOT READY: a test copy
         // for class 6 crashed the pause menu's Quest page (the sheet wasn't loaded there)
@@ -2675,5 +2685,6 @@ bool ClassesInit()
         g_logBinds = g_logSpriteFiles = g_logSounds = g_logActions = true;
         Log("classes: DEBUG LOGGING on (dmfd_debug.txt)");
     }
+    ClassFilesInit();
     return true;
 }

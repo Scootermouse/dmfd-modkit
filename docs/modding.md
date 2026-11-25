@@ -151,6 +151,22 @@ voice and name, and it starts at level 1.
 without the mod. Each extra class's character is in **`SystemData.bin.classes`** next to it; keep
 the two together. `tools\py.bat tools\save.py <path to SystemData.bin>` lists every class.
 
+**Its own weapon and effect files.** A new body with other proportions needs its weapons placed
+differently (`_offsets.txt`), and maybe its swings' reach changed (the slash effects' boxes,
+`_hitboxes.txt`), without changing the class it borrows from. It gets its own copies by name, from
+its body folder's name without `_cb00` (body `cleric_cb00` -> `cleric`):
+- `cleric_ef00`: used instead of the borrowed class's effect file (`pl0_ef00` for an
+  Empress-based class);
+- `cleric_` + a weapon file's name, e.g. `cleric_pl0_cw00`: used instead of that weapon file
+  (`pl0_cw00`, the starting sword), for every item that shows it; `cleric_pl2_tw00` for a Shinobi
+  throwing weapon. Make only the ones you change.
+
+Each is a copied sprite folder like any new sprite file (with a `_source.txt` naming the original,
+e.g. `pl0_cw00`), and must be in **the same mod as the class** (combining gives each mod's new
+files its own prefix). They're used during quests (*confirmed in game: an Empress-based class's
+own swords 40 px higher, the Empress's unchanged*); character pictures in menus (status, inn)
+still show the original files. `dmfd_content.log` lists each class's own files at start-up.
+
 **Its own moves** need a code mod: moves are written into the game's program (see
 [moves.md](moves.md)). Its look, timing and hit boxes are data (next section).
 

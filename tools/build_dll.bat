@@ -15,7 +15,7 @@ set MH=%ROOT%third_party\minhook\src
 set IG=%ROOT%third_party\imgui
 cl /nologo /O2 /MT /EHsc /std:c++17 /W3 /LD /MP "/d1trimfile:%ROOT%\" ^
    /I"%ROOT%third_party\minhook\include" /I"%IG%" /I"%IG%\backends" ^
-   "%ROOT%src\proxy.cpp" "%ROOT%src\datamod.cpp" "%ROOT%src\items.cpp" "%ROOT%src\icons.cpp" "%ROOT%src\drops.cpp" "%ROOT%src\classes.cpp" "%ROOT%src\net.cpp" "%ROOT%src\loader.cpp" "%ROOT%src\menu.cpp" "%ROOT%src\startup.cpp" ^
+   "%ROOT%src\proxy.cpp" "%ROOT%src\datamod.cpp" "%ROOT%src\items.cpp" "%ROOT%src\icons.cpp" "%ROOT%src\drops.cpp" "%ROOT%src\classes.cpp" "%ROOT%src\classfiles.cpp" "%ROOT%src\net.cpp" "%ROOT%src\loader.cpp" "%ROOT%src\menu.cpp" "%ROOT%src\startup.cpp" ^
    "%IG%\imgui.cpp" "%IG%\imgui_draw.cpp" "%IG%\imgui_tables.cpp" "%IG%\imgui_widgets.cpp" ^
    "%IG%\backends\imgui_impl_dx9.cpp" "%IG%\backends\imgui_impl_win32.cpp" ^
    "%MH%\buffer.c" "%MH%\hook.c" "%MH%\trampoline.c" "%MH%\hde\hde32.c" ^

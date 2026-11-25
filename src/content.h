@@ -57,6 +57,10 @@ bool IconsInit();     // hook it if DataMod\icons.txt lists new icon numbers
 bool ClassesReady();  // the class lookups are decrypted and as expected
 bool SaveWatchInit();  // catch the game opening its save (installed in DllMain, before anything else)
 bool ClassesInit();   // apply DataMod\classes.txt (longer per-class lists, test switch)
+void ClassFilesSetup(int cls, int base, const char* body);  // an extra class's own effect / weapon files (classfiles.cpp)
+void ClassFilesPreloaded(int cls, void* loader);           // queue them after the class's preload
+bool ClassFilesInit();                                     // logs how many classes have some
+const char* ClassFileFor(void* actor, const char* file);  // its class's own file for this sprite (null = none)
 bool ClassDefined(int cls);                // classes.txt defines this class
 void ClassesRemoteBase(const uint8_t has[6]);  // other players use these base classes (keep their look)
 
