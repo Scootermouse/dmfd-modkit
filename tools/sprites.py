@@ -538,19 +538,20 @@ def pictures_using(b, mesh):
     return out
 
 
-def set_attack_box(b, mesh, box, donor=None):
-    """Sets a frame mesh's attack boxes to one box (x, y, w, h, kind), or none (box None). The
-    box is written over the mesh's first attack box, so it needs at least one already, or a
-    donor mesh whose first attack record it takes over (the donor deals no hit afterwards;
-    several meshes may share one donor's record when they get the same box)."""
-    e = hitbox_table(b) + 16 * mesh
+def set_attack_box(b, mesh, box, donor=None, which=0):
+    """Sets a frame mesh's attack boxes (which=0) or hurt boxes (which=1, where it can be hit) to
+    one box (x, y, w, h, kind), or none (box None). The box is written over the mesh's first box
+    of that sort, so it needs at least one already, or a donor mesh whose first record of that
+    sort it takes over (the donor has none afterwards; several meshes may share one donor's record
+    when they get the same box)."""
+    e = hitbox_table(b) + 16 * mesh + 8 * which
     n, o = struct.unpack_from("<II", b, e)
     out = bytearray(b)
     if donor is not None and box is not None:
-        de = hitbox_table(b) + 16 * donor
+        de = hitbox_table(b) + 16 * donor + 8 * which
         dn, do = struct.unpack_from("<II", b, de)
         if dn < 1 and do == 0:
-            raise ValueError("donor mesh %d has no attack record" % donor)
+            raise ValueError("donor mesh %d has no %s record" % (donor, ("attack", "hurt")[which]))
         struct.pack_into("<I", out, de, 0)          # the donor deals nothing now
         struct.pack_into("<II", out, e, 1, do)      # the mesh points at the donor's record
         struct.pack_into("<5i", out, do, *box)
@@ -559,9 +560,58 @@ def set_attack_box(b, mesh, box, donor=None):
         struct.pack_into("<I", out, e, 0)
         return bytes(out)
     if n < 1:
-        raise ValueError("mesh %d has no attack box to replace (it needs one already)" % mesh)
+        raise ValueError("mesh %d has no %s box to replace (it needs one already)" % (mesh, ("attack", "hurt")[which]))
     struct.pack_into("<5i", out, o, *box)
     struct.pack_into("<I", out, e, 1)
+    return bytes(out)
+
+
+def key_times(b, index):
+    """Animation <index>'s root picture key start times (channel 0, without the -inf/+inf
+    sentinels; a closing key at the length included) and its length."""
+    hs = _u(b, 0)
+    _, _, length, _, _, nblk, blk = struct.unpack_from("<IIfIIII", b, hs + 0x1C * index)
+    to = _u(b, blk + 0x10)
+    for _ in range(_u(b, blk + 0x0C)):
+        stride, nkey, chan = _u(b, to), _u(b, to + 4), _u(b, to + 8)
+        if chan == 0:
+            ts = [struct.unpack_from("<f", b, to + 0x14 + stride * j)[0] for j in range(nkey)]
+            return [t for t in ts if abs(t) < 1e30], length
+        to += 0x14 + stride * nkey
+    return [], length
+
+
+def warp_timing(b, index, old_times, old_len, new_times, new_len):
+    """Retimes animation <index> the way another one was retimed (old_times -> new_times, old_len
+    -> new_len): each of its keys moves to where its moment falls in the new timing, piecewise
+    linearly between the given times. For a weapon following its body's _timing.txt: a weapon
+    animation needn't have the same keys as the body's. -> new bytes."""
+    pts = sorted(set(zip([float(t) for t in old_times] + [float(old_len)], [float(t) for t in new_times] + [float(new_len)])))
+    if not pts or pts[0][0] > 0:
+        pts.insert(0, (0.0, 0.0))
+
+    def f(t):
+        for (a0, b0), (a1, b1) in zip(pts, pts[1:]):
+            if t <= a1:
+                return b0 if a1 == a0 else b0 + (t - a0) * (b1 - b0) / (a1 - a0)
+        a0, b0 = pts[-1]
+        return b0 + (t - a0)
+
+    hs = _u(b, 0)
+    out = bytearray(b)
+    eo = hs + 0x1C * index
+    _, _, length, _, _, nblk, blk = struct.unpack_from("<IIfIIII", b, eo)
+    struct.pack_into("<f", out, eo + 8, f(length))
+    for k in range(nblk):
+        to = _u(b, blk + 0x48 * k + 0x10)
+        for _ in range(_u(b, blk + 0x48 * k + 0x0C)):
+            stride, nkey = _u(b, to), _u(b, to + 4)
+            for j in range(nkey):
+                ko = to + 0x14 + stride * j
+                t = struct.unpack_from("<f", b, ko)[0]
+                if abs(t) < 1e30:
+                    struct.pack_into("<f", out, ko, f(t))
+            to += 0x14 + stride * nkey
     return bytes(out)
 
 

@@ -336,6 +336,16 @@ All of these were worked out in November 2026 while building a test class with i
   y -6..66). The Warrior's body has no child nodes at all; position tracks (7/8) on body nodes are
   effect attach points (Empress `Wire`, Shinobi and Oracle effect parts). `move_picture` shifts a
   picture's corners; Build mod's `_offsets.txt` uses it (*confirmed in game: the Empress's idle sword moved up 40 px*).
+- **A weapon animation runs on its own clock** with its own key times (*confirmed in game*: slowing
+  the Empress's combo in her body only left the sword ahead). `warp_timing` retimes a weapon
+  animation the way its body's was: each key (every node and channel) moves by a piecewise-linear
+  map from the body's old key times to its new ones (Build mod's `_timing.txt` `follow`). Some move
+  segments are timed in code: the sword strike played at full speed though its animation was
+  five times longer.
+- **Hurt boxes** are the second `{count, offset}` pair of a picture's hit-box entry (attack first);
+  the Empress's idle body box is (0, 28, 32, 56, kind 0). `set_attack_box(..., which=1)` writes them.
+- `_replace.txt` (`import_frames(..., replace=True)`) works for paletted weapon sheets as for bodies
+  (*confirmed in game*).
 
 Still not possible: brand-new animations (entries) and new hit-box records beyond taking over a donor's.
 

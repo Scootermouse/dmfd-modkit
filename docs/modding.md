@@ -169,6 +169,19 @@ with `#` are comments.
     some of them every few frames up to the end.
   - `a<n> nodes <count>` keeps only its first nodes (e.g. drops the tether attach point the
     Empress's wire animations carry).
+  - `0x<hash>` (an animation's name hash) can stand in for `a<n>` in every line.
+  - **Weapons don't follow a body's timing by themselves** (*confirmed in game*): each weapon file
+    has its own copy of the animations with the old timing, so a slowed body animation leaves the
+    weapon running ahead. Put a `_timing.txt` in the weapon's folder (`sprites\<weapon file>\`)
+    with `follow <body folder>`: every plain retiming line of that body's `_timing.txt` is applied
+    to the weapon's animation of the same name, each weapon key moved to where its moment falls in
+    the new timing (a weapon animation needn't have the same keys as the body's). `follow <body
+    folder> <anim> ...` follows only the listed ones (the body's `a<n>` or `0x<hash>`). Picture-track
+    lines (`time:picture`) can't carry over; Build mod says so. Like any weapon edit this changes
+    every item and class using that weapon file.
+  - **Some parts of a move are timed by the game's code**, not by the animation: slowing the
+    Empress's sword combo slowed the wind-up and recovery, but the strike itself (the part with the
+    slash effect) still played at full speed and the move went on as usual (*seen in game*).
 - **`_hitboxes.txt`**: where a frame hits (*confirmed in game*). Each frame picture (`m<number>` in
   its file name) has its own attack boxes.
   - `m<mesh> attack <x> <y> <w> <h> <kind>`: that picture's attack boxes become this one box
@@ -179,6 +192,9 @@ with `#` are comments.
     over another picture's (that one then deals no hit).
   - Some moves' damage is dealt by the game's code while an animation plays; the boxes decide
     where it lands.
+  - `m<mesh> hurt ...`, with the same forms: the picture's **hurt boxes** (where the character can
+    be hit), e.g. the Empress's idle body box is `0 28 32 56 0` (*read from the files; not tried in
+    game*).
 - **`_offsets.txt`**: move frame pictures, e.g. **where a weapon sits on each frame**. x is
   forward (as drawn facing right), y is up, in pixels.
   - `m<picture> <dx> <dy>`: move that frame picture (`m<number>` in its file name).
@@ -205,7 +221,20 @@ with `#` are comments.
   an effect's light colour (channels 10/11/12 = red/green/blue, 0 to 1).
 - **`_replace.txt`** (an empty file): each frame PNG in the folder is a whole new picture for its
   frame instead of an edit of the old one, so a class can look completely different
-  (*confirmed in game*).
+  (*confirmed in game*). It works in weapon folders too (`plN_cwXX`, `pl2_twXX` and copied new
+  weapon folders), so a weapon of a quite different shape needn't be painted over the old one
+  (*confirmed in game: the Empress's idle sword drawn as a ring*).
+
+**Swing trails and weapon effects** aren't in the weapon files: the game's code shows them from the
+class's effect file (`plN_ef00`, e.g. the Empress's slash effect in `pl0_ef00`), which can be
+redrawn like any sprite file; when and where they show is decided by the code. Each weapon file
+also has a couple of animations its body doesn't (2 in `pl0_cw00`), unused as far as known.
+
+**Finding a move's animations:** animations are known by number (the `aNNN` in exported frame
+names, played by `anim_viewer.py`) and by name hash. For example, the Empress's normal sword combo
+is `剣_通常１段`/`２段`/`３段`, each in four parts: wind-up 準備, slash 斬り, end 終了, return 戻り
+(hit 2: `0x02ff4ca0`, `0x984c24b9`, `0x7d1ac120`, `0xe72fda56`); her Dragon Sword moves are the
+`龍_ソード` ones. How names become hashes: FORMAT.md, "Animation names".
 
 The game's file opens are logged; if the game crashes, `dmfd_content.log` records the crash address and call chain.
 

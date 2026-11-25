@@ -652,6 +652,59 @@ TIMING_TXT = "_timing.txt"  # in a sprite folder: new animation lengths / pictur
 HITBOX_TXT = "_hitboxes.txt"  # in a sprite folder: attack boxes of frame pictures
 
 
+def anim_index(b, tok):
+    """a<n> -> n; 0x<hash> -> the index of the animation with that name hash in b."""
+    tok = tok.strip()
+    if tok.lower().startswith("0x"):
+        h = int(tok, 16)
+        for a in sprites.animations(b):
+            if a["hash"] == h:
+                return a["index"]
+        raise ValueError("no animation with hash %s in this file" % tok)
+    return int(tok.lstrip("aA"))
+
+
+def follow_timing(b, body_folder, where, only=()):
+    """A weapon follows a body's retiming (see apply_timing). -> (new bytes, animations changed)."""
+    folder = os.path.join(MOD, "sprites", body_folder)
+    path = os.path.join(folder, TIMING_TXT)
+    if not os.path.exists(path):
+        raise ValueError("sprites\%s has no %s" % (body_folder, TIMING_TXT))
+    base = body_folder
+    if not asset_exists("Win/%s.osb" % base):
+        src = os.path.join(folder, SOURCE_TXT)
+        base = open(src, encoding="utf-8-sig").read().strip() if os.path.exists(src) else ""
+    body = sprites.load("Win/%s.osb" % base)
+    banims = sprites.animations(body)
+    only = {banims[anim_index(body, t)]["hash"] for t in only}
+    mine = {a["hash"]: a["index"] for a in sprites.animations(b)}
+    out, done, skipped = b, 0, 0
+    for line in open(path, encoding="utf-8-sig"):
+        line = line.split("#", 1)[0].strip()
+        parts = line.split()
+        if len(parts) < 3 or parts[0].lower() == "follow" or parts[1].lower() == "nodes":
+            continue
+        if any(":" in x for x in parts[2:]) or "loop" in parts[2:]:
+            skipped += 1
+            continue
+        bi = anim_index(body, parts[0])
+        h = banims[bi]["hash"]
+        if h not in mine or (only and h not in only):
+            continue
+        old, old_len = sprites.key_times(body, bi)
+        new = [float(x) for x in parts[2:]]
+        if len(old) == len(new) + 1:
+            old = old[:-1]  # the closing key at the old length (set_timing moves it to the new one)
+        if len(old) != len(new):
+            continue
+        out = sprites.warp_timing(out, mine[h], old, old_len, new, float(parts[1]))
+        done += 1
+    if skipped:
+        print("  note: %d picture-track line(s) of sprites\%s can't carry over to a weapon" % (skipped, body_folder))
+    print("  follows sprites\%s: %d animation(s) retimed the same way" % (body_folder, done))
+    return out, done
+
+
 def apply_timing(b, path, where):
     """_timing.txt lines, '#' comments:
         a<index> <length> <t0> <t1> ...       new start time for each picture key, in order
@@ -660,19 +713,31 @@ def apply_timing(b, path, where):
             "loop" then cycles the listed keys every <every> ticks from <from> up to <length>.
         a<index> nodes <n>                    keep only the animation's first n nodes (drops e.g.
             the tether attach point of the Empress's wire animations)
+        follow <body folder> [<anim> ...]     (a weapon folder) every plain retiming in that body
+            folder's _timing.txt, applied to this file's animations of the same name: each key
+            moves to where its moment falls in the new timing (picture-track lines can't carry over);
+            listing animations (the body's a<n> or 0x<hash>) follows only those
+    <index> is a<n> (this file's numbering) or 0x<animation name hash>.
     -> new bytes, or None if nothing changed."""
     out, done = b, 0
+    def idx(tok):
+        return anim_index(out, tok)
     for no, line in enumerate(open(path, encoding="utf-8-sig"), 1):
         line = line.split("#", 1)[0].strip()
         if not line:
             continue
         parts = line.split()
         try:
+            if parts[0].lower() == "follow":
+                n = follow_timing(out, parts[1], where, parts[2:])
+                out, k = n
+                done += k
+                continue
             if len(parts) == 3 and parts[1].lower() == "nodes":
-                out = sprites.set_node_count(out, int(parts[0].lstrip("aA")), int(parts[2]))
+                out = sprites.set_node_count(out, idx(parts[0]), int(parts[2]))
                 done += 1
                 continue
-            index, length, rest = int(parts[0].lstrip("aA")), float(parts[1]), parts[2:]
+            index, length, rest = idx(parts[0]), float(parts[1]), parts[2:]
             if any(":" in x for x in rest) or "loop" in rest:
                 keys, loop = [], None
                 if "loop" in rest:
@@ -769,6 +834,7 @@ def apply_hitboxes(b, path, where):
         m<mesh> attack <x> <y> <w> <h> <kind>   the frame picture's attack boxes become this one box
                                                 (centre x, centre y up from the feet, size, kind)
         m<mesh> attack none                     the frame picture deals no hit
+        m<mesh> hurt ...                        the same for its hurt boxes (where it can be hit)
         m<mesh> attack <x> <y> <w> <h> <kind> from m<donor>
             for a frame with no attack record: it takes over the donor frame's first one (the
             donor then deals no hit; frames with the same box may share one donor)
@@ -781,8 +847,9 @@ def apply_hitboxes(b, path, where):
         parts = line.split()
         try:
             mesh = int(parts[0].lstrip("mM"))
-            if parts[1].lower() != "attack":
-                raise ValueError("expected 'attack'")
+            if parts[1].lower() not in ("attack", "hurt"):
+                raise ValueError("expected 'attack' or 'hurt'")
+            which = 0 if parts[1].lower() == "attack" else 1
             donor = None
             if len(parts) >= 9 and parts[7].lower() == "from":
                 donor = int(parts[8].lstrip("mM"))
@@ -790,7 +857,7 @@ def apply_hitboxes(b, path, where):
             box = None if parts[2].lower() == "none" else tuple(int(x) for x in parts[2:7])
             if box is not None and len(box) != 5:
                 raise ValueError("a box is x y w h kind")
-            out = sprites.set_attack_box(out, mesh, box, donor)
+            out = sprites.set_attack_box(out, mesh, box, donor, which)
             done += 1
         except (IndexError, ValueError) as e:
             problem(where, "%s line %d: %s" % (HITBOX_TXT, no, e))
