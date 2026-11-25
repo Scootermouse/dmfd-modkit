@@ -835,6 +835,7 @@ def apply_hitboxes(b, path, where):
                                                 (centre x, centre y up from the feet, size, kind)
         m<mesh> attack none                     the frame picture deals no hit
         m<mesh> hurt ...                        the same for its hurt boxes (where it can be hit)
+    a<n> or 0x<hash> in place of m<mesh>: every picture of that animation.
         m<mesh> attack <x> <y> <w> <h> <kind> from m<donor>
             for a frame with no attack record: it takes over the donor frame's first one (the
             donor then deals no hit; frames with the same box may share one donor)
@@ -846,7 +847,12 @@ def apply_hitboxes(b, path, where):
             continue
         parts = line.split()
         try:
-            mesh = int(parts[0].lstrip("mM"))
+            tok = parts[0].lower()
+            if tok.startswith("m"):
+                meshes = [int(tok[1:])]
+            else:
+                ai = anim_index(out, tok)
+                meshes = sorted({m for _, m in sprites.frames(sprites.animations(out)[ai])})
             if parts[1].lower() not in ("attack", "hurt"):
                 raise ValueError("expected 'attack' or 'hurt'")
             which = 0 if parts[1].lower() == "attack" else 1
@@ -857,8 +863,9 @@ def apply_hitboxes(b, path, where):
             box = None if parts[2].lower() == "none" else tuple(int(x) for x in parts[2:7])
             if box is not None and len(box) != 5:
                 raise ValueError("a box is x y w h kind")
-            out = sprites.set_attack_box(out, mesh, box, donor, which)
-            done += 1
+            for mesh in meshes:
+                out = sprites.set_attack_box(out, mesh, box, donor, which)
+                done += 1
         except (IndexError, ValueError) as e:
             problem(where, "%s line %d: %s" % (HITBOX_TXT, no, e))
     if done:

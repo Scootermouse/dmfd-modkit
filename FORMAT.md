@@ -343,7 +343,11 @@ All of these were worked out in November 2026 while building a test class with i
   segments are timed in code: the sword strike played at full speed though its animation was
   five times longer.
 - **Hurt boxes** are the second `{count, offset}` pair of a picture's hit-box entry (attack first);
-  the Empress's idle body box is (0, 28, 32, 56, kind 0). `set_attack_box(..., which=1)` writes them.
+  the Empress's idle body box is (0, 28, 32, 56, kind 0). `set_attack_box(..., which=1)` writes them
+  (*confirmed in game*: with none on her idle pictures nothing hit her while she stood still).
+- **Animation names** for the class bodies, weapons and effects are listed in `tools/anim_names.txt`
+  (hash, name; 503 names covering 2,579 of 4,535 animations, matched against the strings of the
+  unpacked program); `tools/anim_names.py` lists a file's animations with them.
 - `_replace.txt` (`import_frames(..., replace=True)`) works for paletted weapon sheets as for bodies
   (*confirmed in game*).
 

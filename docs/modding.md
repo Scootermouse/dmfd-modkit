@@ -193,8 +193,9 @@ with `#` are comments.
   - Some moves' damage is dealt by the game's code while an animation plays; the boxes decide
     where it lands.
   - `m<mesh> hurt ...`, with the same forms: the picture's **hurt boxes** (where the character can
-    be hit), e.g. the Empress's idle body box is `0 28 32 56 0` (*read from the files; not tried in
-    game*).
+    be hit), e.g. the Empress's idle body box is `0 28 32 56 0` (*confirmed in game: with
+    `0x67d7af17 hurt none` nothing hit her while she stood idle, and she was hit as usual otherwise*).
+  - `a<n>` or `0x<hash>` in place of `m<mesh>`: the line applies to every picture of that animation.
 - **`_offsets.txt`**: move frame pictures, e.g. **where a weapon sits on each frame**. x is
   forward (as drawn facing right), y is up, in pixels.
   - `m<picture> <dx> <dy>`: move that frame picture (`m<number>` in its file name).
@@ -230,8 +231,11 @@ class's effect file (`plN_ef00`, e.g. the Empress's slash effect in `pl0_ef00`),
 redrawn like any sprite file; when and where they show is decided by the code. Each weapon file
 also has a couple of animations its body doesn't (2 in `pl0_cw00`), unused as far as known.
 
-**Finding a move's animations:** animations are known by number (the `aNNN` in exported frame
-names, played by `anim_viewer.py`) and by name hash. For example, the Empress's normal sword combo
+**Finding a move's animations:** `tools\py.bat tools\anim_names.py pl0_cb00` lists a sprite file's
+animations: number (the `aNNN` in exported frame names), name hash, length, picture keys and name
+(from `tools\anim_names.txt`: 503 names, most body and weapon animations; many effect ones are
+unnamed). A second argument filters by name, e.g. `anim_names.py pl0_cw00 剣_通常`. Animations are
+known by number and by name hash. For example, the Empress's normal sword combo
 is `剣_通常１段`/`２段`/`３段`, each in four parts: wind-up 準備, slash 斬り, end 終了, return 戻り
 (hit 2: `0x02ff4ca0`, `0x984c24b9`, `0x7d1ac120`, `0xe72fda56`); her Dragon Sword moves are the
 `龍_ソード` ones. How names become hashes: FORMAT.md, "Animation names".
