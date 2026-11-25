@@ -21,6 +21,7 @@ call :build Rebalance "%CM%\Rebalance\main.cpp" "%CM%\Rebalance\patches.cpp" "%C
 call :build QuickSpells "%CM%\QuickSpells\main.cpp" "%CM%\QuickSpells\quickspell.cpp" || exit /b 1
 call :build SkipQuit "%CM%\SkipQuit\main.cpp" || exit /b 1
 call :build HolyUp "%CM%\HolyUp\main.cpp" || exit /b 1
+call :build EffectTweaks "%CM%\EffectTweaks\main.cpp" || exit /b 1
 exit /b 0
 
 rem :build <folder> <sources...>

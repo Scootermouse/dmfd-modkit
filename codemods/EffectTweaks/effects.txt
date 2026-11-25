@@ -1,0 +1,7 @@
+# Effect Tweaks: one effect a line; "#" starts a comment.
+#   <animation> swap=<animation> start=<frames> dx=<pixels> dy=<pixels>
+# <animation> is 0x<name hash> (tools\anim_names.py, or "Log animations as they start" in the
+# Effect Tweaks menu, which writes each one to mods\EffectTweaks\mod.log) or the animation name.
+# swap: play that animation of the same file instead. start: begin that many frames in.
+# dx is forward (as drawn facing right), dy is up. Example:
+# 0x12345678 start=2 dy=20

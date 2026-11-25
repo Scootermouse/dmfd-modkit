@@ -226,10 +226,30 @@ with `#` are comments.
   weapon folders), so a weapon of a quite different shape needn't be painted over the old one
   (*confirmed in game: the Empress's idle sword drawn as a ring*).
 
-**Swing trails and weapon effects** aren't in the weapon files: the game's code shows them from the
-class's effect file (`plN_ef00`, e.g. the Empress's slash effect in `pl0_ef00`), which can be
-redrawn like any sprite file; when and where they show is decided by the code. Each weapon file
-also has a couple of animations its body doesn't (2 in `pl0_cw00`), unused as far as known.
+**Swing trails and effects.** A normal sword swing's blur is the weapon's own picture for that
+frame (the weapon file), so it's edited and placed like the weapon. Added effects, such as the
+Empress's walking-slash trail or her fireball, come from the class's effect file (`plN_ef00`): their
+pictures can be redrawn like any sprite file, and the game's code decides when they start. Each
+weapon file also has a couple of animations its body doesn't (2 in `pl0_cw00`), unused as far as
+known.
+
+**Effect Tweaks** (a code mod, `codemods/EffectTweaks`) changes how effects play, from
+`mods\EffectTweaks\effects.txt`, one effect a line:
+`<animation> swap=<animation> start=<frames> dx=<pixels> dy=<pixels>`.
+- `<animation>` is `0x<name hash>` or the animation's name. To find an effect's hash, tick "Log
+  animations as they start" on the mod's page in the in-game menu, do the move, and read the new
+  lines in `mods\EffectTweaks\mod.log` (each animation is logged once, with the game code that
+  started it; the Empress's own effects come from code addresses `d30000`-`d70000`).
+  `tools\anim_names.py` gives names where known.
+- `swap=` plays another animation of the same file instead.
+- `start=` begins that many frames into the effect (skips its beginning).
+- `dx=`/`dy=` shift it forward (as drawn facing right) and up. This works for effects attached to
+  the character (*confirmed in game: the Empress's walking-slash trail 30 px higher*); a shot's own
+  picture ignores it (it is placed at the shot every frame; *seen in game with her fireball*).
+- "Reload effects.txt" in the menu applies changes without restarting.
+- Not yet: delaying an effect or changing its playback speed (the trigger moment stays the move's).
+
+Every class's effects go through the same engine call, so this works for all of them.
 
 **Finding a move's animations:** `tools\py.bat tools\anim_names.py pl0_cb00` lists a sprite file's
 animations: number (the `aNNN` in exported frame names), name hash, length, picture keys and name
