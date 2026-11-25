@@ -99,6 +99,9 @@ Things to know:
 
 ### Weapon sprites
 
+A full walk-through (new art, item, placement, timing, reach, effects, and a custom class's own
+weapons): [weapon-example.md](weapon-example.md).
+
 **Export weapon sprites.bat** writes every weapon picture to `mod\sprites_original\<file>\` (`pl0_cw00` … `pl4_cw00`, Shinobi throwing weapons `pl2_tw00` …), plus `mod\sprites_original\weapons.csv`: which items use each picture, with their colour numbers.
 
 - **Change an existing weapon picture:** copy frames into `mod\sprites\<same folder>\` and edit them, like bodies. Every item using that picture changes, for every class that uses it (Bandit's daggers are Empress pictures, her shuriken Shinobi pictures).
