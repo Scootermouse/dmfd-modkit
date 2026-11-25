@@ -183,7 +183,7 @@ def tools_zip():
         if n.endswith(".bat"):
             files[n] = os.path.join(ROOT, n)
     for n in os.listdir(os.path.join(ROOT, "tools")):
-        if (n.endswith(".py") and n not in DEV_TOOLS) or n == "py.bat":
+        if (n.endswith(".py") and n not in DEV_TOOLS) or n in ("py.bat", "anim_names.txt", "names.txt"):
             files["tools/" + n] = os.path.join(ROOT, "tools", n)
     for rel in (os.path.join("tools", "python"), "docs"):
         for dirpath, dirs, names in os.walk(os.path.join(ROOT, rel)):
