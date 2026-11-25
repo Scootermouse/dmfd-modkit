@@ -51,7 +51,7 @@ Manager. Another mod folder builds with `tools\py.bat tools\build_mod.py --mod <
 | `order` | Sort position in lists. |
 | `sprite` | Weapons: which weapon picture it shows, e.g. `pl0_cw00` (the starting sword), or a new sprite folder of yours (see Weapon sprites). |
 | `sprite_palette` | Weapons: the palette file for that picture, as in `all_items.csv`. Usually leave it. |
-| `color` | Weapons: which color scheme of the palette, e.g. starting sword `0` gray blade, `4` red blade. `all_items.csv` shows what each weapon uses. (The older spelling `colour` still works.) |
+| `color` | Weapons: which color scheme of the palette, e.g. starting sword `0` gray blade, `4` red blade. `all_items.csv` shows what each weapon uses. (The older spelling `colour` still works. With the 0.10 tools, spell it `colour`.) |
 | `notes` | Anything; ignored. |
 
 | `effect1` `effect2` `effect3` | The item's three effect slots: an effect name from `all_effects.csv` (e.g. `LEVEL_DAMAGE_UP`), or `none`. |
