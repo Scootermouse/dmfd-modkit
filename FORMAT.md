@@ -329,6 +329,14 @@ All of these were worked out in November 2026 while building a test class with i
 - **Hit boxes are in the body file, per frame picture.** The table at header `+0x28` has, for each mesh, two `{u32 count, u32 offset}` pairs: attack boxes, then hurt (body) boxes. A box is 5 int32: centre x, centre y (up from the feet), width, height, kind (0 = body; 10/11 on the Empress's sword strike). The game's collision uses the boxes of the picture being shown (logged at the hit handler: the attacker's box sizes matched these entries). `set_attack_box` rewrites a picture's first attack box, or takes over a donor picture's record when the picture has none. Shots are different: a shot's box is a constant in the exe (`docs/moves.md` 1.5).
 - **Animation names** are hashed (`tb2.ice_hash` of the Japanese name, e.g. 龍_通常ブレス（攻撃）); the exe fills the hashes at start-up from string literals, so names can be recovered from the program (*read from the program*).
 
+- **Weapons are placed by their own pictures, not by body nodes.** A weapon file (`plN_cwXX`) holds
+  the class's animations under the same name hashes and key times as the body (Warrior `pl1_cw00`:
+  66 of the body's 67; Empress `pl0_cw00`: 124 of 130, numbered differently); each weapon picture's
+  quad corners are relative to the character's feet (x forward, y up: the Empress's idle body spans
+  y -6..66). The Warrior's body has no child nodes at all; position tracks (7/8) on body nodes are
+  effect attach points (Empress `Wire`, Shinobi and Oracle effect parts). `move_picture` shifts a
+  picture's corners; Build mod's `_offsets.txt` uses it (*read from the files*).
+
 Still not possible: brand-new animations (entries) and new hit-box records beyond taking over a donor's.
 
 ## 8. Next steps, in order of value

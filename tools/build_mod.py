@@ -647,6 +647,7 @@ def apply_tracks(b, path, where):
     return out if total else None
 
 
+OFFSETS_TXT = "_offsets.txt"  # in a sprite folder: move frame pictures (e.g. a weapon's place per frame)
 TIMING_TXT = "_timing.txt"  # in a sprite folder: new animation lengths / picture key times
 HITBOX_TXT = "_hitboxes.txt"  # in a sprite folder: attack boxes of frame pictures
 
@@ -696,6 +697,71 @@ def apply_timing(b, path, where):
     if done:
         print("  %s: %d animation(s) retimed" % (TIMING_TXT, done))
     return out if done else None
+
+
+def apply_offsets(b, path, where):
+    """_offsets.txt lines, '#' comments; x forward (as drawn facing right), y up, in pixels:
+        m<mesh> <dx> <dy>             move that frame picture
+        a<anim> <dx> <dy>             move every picture of that animation
+        a<anim> k<key> <dx> <dy>      move the picture its key <key> (0-based) shows
+    <anim> is the animation's number in this file (aNNN in its frame names) or 0x<name hash>,
+    which is the same in a body and its weapons (a weapon file numbers its animations its own way).
+    A picture shown elsewhere too moves there as well (noted). Moves of one picture add up.
+    -> new bytes, or None if nothing changed."""
+    anims = sprites.animations(b)
+    moves = {}
+    for no, line in enumerate(open(path, encoding="utf-8-sig"), 1):
+        line = line.split("#", 1)[0].strip()
+        if not line:
+            continue
+        parts = line.split()
+        try:
+            what = parts[0].lower()
+            if what.startswith("m"):
+                meshes = [int(what[1:])]
+                dx, dy = float(parts[1]), float(parts[2])
+            elif what.startswith("a") or what.startswith("0x"):
+                if what.startswith("0x"):
+                    h = int(what, 16)
+                    found = [a["index"] for a in anims if a["hash"] == h]
+                    if not found:
+                        raise ValueError("no animation with hash %s in this file" % what)
+                    index = found[0]
+                else:
+                    index = int(what[1:])
+                if not 0 <= index < len(anims):
+                    raise ValueError("no animation %d" % index)
+                pics = [m for _, m in sprites.frames(anims[index])]
+                if parts[1].lower().startswith("k"):
+                    key = int(parts[1][1:])
+                    if not 0 <= key < len(pics):
+                        raise ValueError("animation %d has %d picture keys" % (index, len(pics)))
+                    meshes = [pics[key]]
+                    dx, dy = float(parts[2]), float(parts[3])
+                else:
+                    meshes = sorted(set(pics))
+                    dx, dy = float(parts[1]), float(parts[2])
+            else:
+                raise ValueError("starts with m<picture>, a<animation> or 0x<animation hash>")
+            for m in meshes:
+                ox, oy = moves.get(m, (0.0, 0.0))
+                moves[m] = (ox + dx, oy + dy)
+        except (IndexError, ValueError) as e:
+            problem(where, "%s line %d: %s" % (OFFSETS_TXT, no, e))
+    out = b
+    for m, (dx, dy) in sorted(moves.items()):
+        try:
+            out = sprites.move_picture(out, m, dx, dy)
+        except ValueError as e:
+            problem(where, "%s: %s" % (OFFSETS_TXT, e))
+            continue
+        uses = sprites.pictures_using(b, m)
+        if len(uses) > 1:
+            print("  note: picture m%d is shown in %d places (%s), all moved" % (
+                m, len(uses), ", ".join("a%03d k%d" % u for u in uses[:6]) + (" ..." if len(uses) > 6 else "")))
+    if moves:
+        print("  %s: %d picture(s) moved" % (OFFSETS_TXT, len(moves)))
+    return out if moves else None
 
 
 def apply_hitboxes(b, path, where):
@@ -779,7 +845,8 @@ def build_sprites():
                 problem(where, "this isn't a game sprite file; for a new one, copy a whole exported folder "
                                "(it has a %s saying which file it starts from)" % SOURCE_TXT)
                 continue
-        elif not pngs:
+        elif not pngs and not any(os.path.exists(os.path.join(path, t))
+                                  for t in (TRACKS_TXT, TIMING_TXT, HITBOX_TXT, OFFSETS_TXT)):
             continue
         b = sprites.load("Win/%s.osb" % base)
         full = not sprites.is_paletted(b)
@@ -793,7 +860,7 @@ def build_sprites():
             problem(where, "%s uses a palette Build mod doesn't know; class bodies (pl0_cb00), weapons "
                            "(pl0_cw00) and full-colour pictures (com_pl_icon) can be edited" % base)
             continue
-        print("Importing %d frame(s) into %s%s%s ..." % (len(pngs), asset,
+        print("%s %s%s%s ..." % ("Importing %d frame(s) into" % len(pngs) if pngs else "Changing", asset,
                                                          "" if base == folder else " (new, from %s)" % base,
                                                          " (full colour)" if full else ""))
         if replace and pngs:
@@ -809,6 +876,9 @@ def build_sprites():
         hitbox = os.path.join(path, HITBOX_TXT)
         if os.path.exists(hitbox):
             new = apply_hitboxes(new or b, hitbox, where) or new
+        offsets = os.path.join(path, OFFSETS_TXT)
+        if os.path.exists(offsets):
+            new = apply_offsets(new or b, offsets, where) or new
         if base != folder:
             new, n = sprites.rename_self_refs(new or b, base + ".osb", folder + ".osb")
             if n:

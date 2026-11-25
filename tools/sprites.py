@@ -508,6 +508,36 @@ def hitboxes(b, mesh):
     return tuple(out)
 
 
+def move_picture(b, mesh, dx, dy):
+    """Shift frame picture <mesh> by (dx, dy) pixels: x forward (as drawn facing right), y up from
+    the feet. Every corner of its quads moves, so wherever the picture shows, it shows moved. This
+    is how a weapon is placed: weapon files (plN_cwXX) carry the body's animations under the same
+    names and key times, and each weapon picture's corners are its position relative to the
+    character's feet. -> new bytes."""
+    sec = _u(b, 0x1C)
+    n = _u(b, sec)
+    if not 0 <= mesh < n:
+        raise ValueError("no picture m%d (the file has %d)" % (mesh, n))
+    out = bytearray(b)
+    rec = sec + 4 + 0x18 * mesh
+    _, _, vo, io, nv, ni = struct.unpack_from("<6I", b, rec)
+    for k in range(nv):
+        o = rec + vo + 20 * k
+        x, y = struct.unpack_from("<2f", b, o)
+        struct.pack_into("<2f", out, o, x + dx, y + dy)
+    return bytes(out)
+
+
+def pictures_using(b, mesh):
+    """[(animation index, key index)] whose root picture track shows <mesh>."""
+    out = []
+    for a in animations(b):
+        for k, (t, m) in enumerate(frames(a)):
+            if m == mesh:
+                out.append((a["index"], k))
+    return out
+
+
 def set_attack_box(b, mesh, box, donor=None):
     """Sets a frame mesh's attack boxes to one box (x, y, w, h, kind), or none (box None). The
     box is written over the mesh's first attack box, so it needs at least one already, or a

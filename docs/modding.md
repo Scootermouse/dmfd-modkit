@@ -179,6 +179,27 @@ with `#` are comments.
     over another picture's (that one then deals no hit).
   - Some moves' damage is dealt by the game's code while an animation plays; the boxes decide
     where it lands.
+- **`_offsets.txt`**: move frame pictures, e.g. **where a weapon sits on each frame**. x is
+  forward (as drawn facing right), y is up, in pixels.
+  - `m<picture> <dx> <dy>`: move that frame picture (`m<number>` in its file name).
+  - `a<n> <dx> <dy>`: move every picture of animation `n`.
+  - `a<n> k<key> <dx> <dy>`: move only the picture its key `<key>` shows (0-based, in key order).
+  - `0x<hash>` can stand in for `a<n>`: an animation's name hash is the same in a body and its
+    weapons, while the numbers differ (see below).
+  - A picture shown in other places moves there too; Build mod lists them. Moves of one picture
+    add up. A folder may hold only this file (no PNGs).
+
+  **How weapons are placed:** a weapon isn't attached to a point on the body. Each weapon file
+  (`plN_cwXX`, Shinobi throwing weapons `pl2_twXX`) carries its own copy of the class's animations,
+  under the same names and with the same key times, and the game plays the one matching the body.
+  Each weapon picture is drawn relative to the character's feet, so its place on a frame is simply
+  where that picture sits. To move a weapon on one move, put an `_offsets.txt` in
+  `sprites\<weapon file>\`; a weapon file numbers its animations its own way (the `aNNN` in an
+  export of that file), so `0x<hash>` is handy: e.g. `0x67d7af17 0 40` lifts the weapon 40 pixels
+  in the Empress's idle (`待機`). Every item using that weapon file changes; for one new weapon only,
+  copy the folder under a new name first (Weapon sprites). Body nodes with positions
+  (channels 7/8, see `_tracks.txt`) are effect attach points such as the Empress's tether, not
+  weapons. (*Read from the files; in-game test pending.*)
 - **`_tracks.txt`**: other animation values (*confirmed in game* for light colours):
   `<animation name or 0xhash> <node 0xhash> <channel> <value>` sets every key of that track, e.g.
   an effect's light colour (channels 10/11/12 = red/green/blue, 0 to 1).
