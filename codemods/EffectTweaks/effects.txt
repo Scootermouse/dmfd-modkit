@@ -10,3 +10,14 @@
 # A move that waits for its effect (e.g. the Empress's walking slash) waits longer with delay or a
 # slower speed. Example:
 # 0x12345678 start=2 dy=20 delay=6 speed=0.8
+#
+# Breath shots (the Empress's fire, wood, earth, metal and water breath): where a shot starts.
+#   shot <pose> dx=<pixels> dy=<pixels> class=<class>
+# <pose>: 0-5 or all. The game starts a shot at one of six points by the pose she breathes from
+# (forward, up): 0 (30,37), 1 (30,37), 2 (30,56), 3 (30,37), 4 (26,43), 5 (0,86); 0 is standing, 4 a jump. "Log animations
+# as they start" also logs each pose as it's used. dx/dy are added to that point.
+# class=: 0-5 (0 = Empress) or an extra class's id; without it, every class using these moves.
+# The most specific line wins (class and pose, then class, then pose, then all). This changes
+# where shots hit, so everyone in an online party should use the same lines. Example, a taller
+# Empress:
+# shot all dy=20 class=0

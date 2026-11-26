@@ -289,6 +289,25 @@ known.
 
 Every class's effects go through the same engine call, so this works for all of them.
 
+**Where breath shots start** (Effect Tweaks 0.3). The Empress's breath shots (fire, wood, earth,
+metal, water) start at a point fixed in the game's code, picked by the pose she breathes from. A
+taller or shorter body needs them moved. In the same `effects.txt`:
+`shot <pose> dx=<pixels> dy=<pixels> class=<class>`
+- `<pose>` is 0-5 or `all`. The game's points (forward, up from her feet): 0 (30, 37), 1 (30, 37),
+  2 (30, 56), 3 (30, 37), 4 (26, 43), 5 (0, 86); 0 is standing and 4 a jump (*seen in game*; the
+  others not yet identified). With "Log animations as they start" ticked, the
+  log also shows each pose (and class) the first time a shot starts from it, to tell which is which.
+- `dx=`/`dy=` are added to that point (forward as drawn facing right, up).
+- `class=` is 0-5 (0 = Empress) or an extra class's id (from its class definition); without it, the
+  line is for every class using the Empress's moves. The most specific line wins: class and pose,
+  then class, then pose, then `all`.
+- This moves where shots hit, so the mod is `online=same`: everyone in a party needs the same
+  `effects.txt`.
+- The shots' own art is in their sprite files; their hit box sizes are still fixed in the game's code.
+
+Example, an Empress 20 px taller: `shot all dy=20 class=0`. (*Confirmed in game: standing, jumping
+and charged shots all moved.*)
+
 **Finding a move's animations:** `tools\py.bat tools\anim_names.py pl0_cb00` lists a sprite file's
 animations: number (the `aNNN` in exported frame names), name hash, length, picture keys and name
 (from `tools\anim_names.txt`: 503 names, most body and weapon animations; many effect ones are
