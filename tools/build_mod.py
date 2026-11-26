@@ -1338,7 +1338,7 @@ def text_changes(tables):
 
 
 def write_package(info, package, assets, files):
-    """build/package/<folder>: mod.ini + data/ (package.json, assets, pictures)."""
+    """build/package/<folder>: mod.ini + data/ (package.json, assets, pictures) [+ effects.txt]."""
     import json
     import shutil
     out = os.path.join(ROOT, "build", "package", info["folder"])
@@ -1362,6 +1362,11 @@ def write_package(info, package, assets, files):
     package["palettes"] = sorted(a for a in assets if a in edited_palettes)
     with open(os.path.join(data, "package.json"), "w", encoding="utf-8") as f:
         json.dump(package, f, ensure_ascii=False, indent=1)
+    # mod\effects.txt: the mod's lines for the Effect Tweaks code mod (which reads every mod's)
+    effects = os.path.join(MOD, "effects.txt")
+    if os.path.isfile(effects):
+        shutil.copyfile(effects, os.path.join(out, "effects.txt"))
+        print("effects.txt included (needs the Effect Tweaks code mod)")
     with open(os.path.join(out, "mod.ini"), "w", encoding="utf-8") as f:
         f.write("; A data mod for the DMFD mod loader, made with Build mod.\n[mod]\n")
         for k in ("name", "version", "author", "description", "license"):
@@ -1382,6 +1387,8 @@ def install_package(out, folder):
                 enabled = line.strip()[8:]
     if os.path.isdir(os.path.join(dst, "data")):
         shutil.rmtree(os.path.join(dst, "data"))
+    if os.path.isfile(os.path.join(dst, "effects.txt")):  # (gone from the mod: gone from the game)
+        os.remove(os.path.join(dst, "effects.txt"))
     shutil.copytree(out, dst, dirs_exist_ok=True)
     if enabled is not None:
         text = open(ini, encoding="utf-8").read().replace("enabled=1", "enabled=" + enabled)

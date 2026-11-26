@@ -93,8 +93,9 @@ boxes on one line replace a picture's own group of boxes, up to as many as it ha
 ## 8. The slash effect's look and timing
 
 Its pictures can be redrawn like any sprite file (`mod\sprites\pl0_ef00\`). To shift it, delay
-it or change its speed, install the **Effect Tweaks** code mod and edit
-`mods\EffectTweaks\effects.txt` (modding.md, Effect Tweaks). Careful: a swing's slash effect has
+it or change its speed, install the **Effect Tweaks** code mod and write the lines in
+`mod\effects.txt`: Build mod puts it in your mod, and Effect Tweaks reads it from there
+(modding.md, Effect Tweaks). Players of your mod need Effect Tweaks too. Careful: a swing's slash effect has
 the same animation name as the body's and the weapon's, so a line for that name changes all three.
 
 ## 9. Build and test

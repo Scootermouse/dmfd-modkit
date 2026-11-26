@@ -1,4 +1,7 @@
 # Effect Tweaks: one effect a line; "#" starts a comment.
+# This file is for your own changes. A mod can bring its own effects.txt in its folder
+# (mods\<mod>\effects.txt); every switched-on mod's is read, in load order, then this one last.
+# For the same effect, the last line read wins.
 #   <animation> swap=<animation> start=<frames> dx=<pixels> dy=<pixels> delay=<frames> speed=<x>
 # <animation> is 0x<name hash> (tools\anim_names.py, or "Log animations as they start" in the
 # Effect Tweaks menu, which writes each one to mods\EffectTweaks\mod.log) or the animation name.

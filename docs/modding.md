@@ -266,7 +266,7 @@ weapon file also has a couple of animations its body doesn't (2 in `pl0_cw00`), 
 known.
 
 **Effect Tweaks** (a code mod, `codemods/EffectTweaks`) changes how effects play, from
-`mods\EffectTweaks\effects.txt`, one effect a line:
+`effects.txt` files, one effect a line:
 `<animation> swap=<animation> start=<frames> dx=<pixels> dy=<pixels> delay=<frames> speed=<x>`.
 - `<animation>` is `0x<name hash>` or the animation's name. To find an effect's hash, tick "Log
   animations as they start" on the mod's page in the in-game menu, do the move, and read the new
@@ -286,6 +286,14 @@ known.
 - A swing's slash effect has the same animation name as the body's and the weapon's (see Swing
   trails above), so a line for that name changes all three.
 - "Reload effects.txt" in the menu applies changes without restarting.
+
+**Your mod's own effects.txt** (Effect Tweaks 0.4). Put an `effects.txt` in your `mod\` folder
+(next to `mod.ini`): Build mod copies it into your mod (`mods\<your mod>\effects.txt`), and it
+travels in the mod's zip. Effect Tweaks reads the `effects.txt` of every switched-on mod, in load
+order, then its own (`mods\EffectTweaks\effects.txt`, for a player's own changes). For the same
+effect or shot, the last line read wins. Players then only need Effect Tweaks installed; say so in
+your mod's description. The log (`mods\EffectTweaks\mod.log`) lists each file read and how many
+lines it had.
 
 Every class's effects go through the same engine call, so this works for all of them.
 

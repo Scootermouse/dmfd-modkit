@@ -9,6 +9,7 @@
 // - dx=, dy=          shift it (forward as drawn facing right, up), added to the sprite's offset
 //                     from its parent (+78h / +7Ch), set after the call.
 // Breath shots (0.3): "shot" lines move where a shot starts (see the shot section below).
+// 0.4: every switched-on mod's effects.txt is read (see LoadTweaks), so a mod ships its own lines.
 // log_effects=1 (menu) logs every animation started through the call once, with the calling code,
 // so a modder can see which hash an effect has (then tools\anim_names.py for its name).
 #include "../common/modbase.h"
@@ -19,7 +20,7 @@
 #include "imgui.h"
 
 const char MOD_NAME_STR[] = "Effect Tweaks";
-const char MOD_VERSION_STR[] = "0.3";
+const char MOD_VERSION_STR[] = "0.4";
 
 static const uint32_t ANIM_PLAY = 0xE4EA70;  // thiscall(sprite, hash, parent, int, float start), ret 10h
 
@@ -34,6 +35,7 @@ struct Tweak {
 static Tweak g_tweaks[256];
 static int g_nTweaks;
 static char g_path[MAX_PATH], g_ini[MAX_PATH];
+static char g_file[96];  // the file being read, for messages ("Copen\effects.txt")
 
 // ---- breath shot start points (0.3) ----
 // The Empress's breath shots (cPshWork04, made in 0xD63AE0) start at the player's position plus
@@ -47,7 +49,7 @@ static const uint32_t SHOT_PLACE = 0xD31670;
 static const uint32_t SHOT_TABLE = 0x28F4860;  // 6 x {forward, up, 0}
 static const int SHOT_POSES = 6;
 struct ShotTweak { int pose; int cls; float dx, dy; };  // pose / cls -1 = all
-static ShotTweak g_shots[64];
+static ShotTweak g_shots[128];
 static int g_nShots;
 static volatile LONG g_enabled = 1, g_logEffects = 0;
 static volatile LONG g_applied;
@@ -100,42 +102,38 @@ static void ParseShot(char*& ctx, int no)
 {
     ShotTweak t = {-1, -1, 0, 0};
     char* tok = strtok_s(nullptr, " \t\r\n", &ctx);
-    if (!tok) { Log("effects.txt line %d: shot needs a pose (0-5 or all)", no); return; }
+    if (!tok) { Log("%s line %d: shot needs a pose (0-5 or all)", g_file, no); return; }
     if (_stricmp(tok, "all")) {
         t.pose = atoi(tok);
         if (tok[0] < '0' || tok[0] > '9' || t.pose >= SHOT_POSES) {
-            Log("effects.txt line %d: shot pose '%s' should be 0-5 or all", no, tok);
+            Log("%s line %d: shot pose '%s' should be 0-5 or all", g_file, no, tok);
             return;
         }
     }
     while ((tok = strtok_s(nullptr, " \t\r\n", &ctx)) != nullptr) {
         char* eq = strchr(tok, '=');
-        if (!eq) { Log("effects.txt line %d: '%s' should be name=value", no, tok); continue; }
+        if (!eq) { Log("%s line %d: '%s' should be name=value", g_file, no, tok); continue; }
         *eq = 0;
         const char* v = eq + 1;
         if (!_stricmp(tok, "dx")) t.dx = (float)atof(v);
         else if (!_stricmp(tok, "dy")) t.dy = (float)atof(v);
         else if (!_stricmp(tok, "class")) {
             t.cls = ClassNumber(v);
-            if (t.cls == -2) Log("effects.txt line %d: no class '%s' in DataMod\\classes.txt", no, v);
-        } else Log("effects.txt line %d: unknown shot setting '%s'", no, tok);
+            if (t.cls == -2) Log("%s line %d: no class '%s' in DataMod\\classes.txt", g_file, no, v);
+        } else Log("%s line %d: unknown shot setting '%s'", g_file, no, tok);
     }
-    if (g_nShots < 64) g_shots[g_nShots++] = t;
+    if (g_nShots < 128) g_shots[g_nShots++] = t;
 }
 
 // effects.txt: one effect a line, '#' comments:
 //   <animation> swap=<animation> start=<frames> dx=<px> dy=<px>
 //   shot <pose> dx=<px> dy=<px> [class=]
-static void LoadTweaks()
+// One file's lines are added to the lists (a later line for the same effect wins).
+static bool LoadFile(const char* path)
 {
-    g_nTweaks = 0;
-    g_nShots = 0;
-    LoadClassIds();
     FILE* f = nullptr;
-    if (fopen_s(&f, g_path, "rb") || !f) {
-        Log("no %s: nothing to change", g_path);
-        return;
-    }
+    if (fopen_s(&f, path, "rb") || !f) return false;
+    int before = g_nTweaks, shotsBefore = g_nShots;
     char line[512];
     int no = 0;
     while (fgets(line, sizeof line, f) && g_nTweaks < 256) {
@@ -155,7 +153,7 @@ static void LoadTweaks()
         bool any = false;
         while ((tok = strtok_s(nullptr, " \t\r\n", &ctx)) != nullptr) {
             char* eq = strchr(tok, '=');
-            if (!eq) { Log("effects.txt line %d: '%s' should be name=value", no, tok); continue; }
+            if (!eq) { Log("%s line %d: '%s' should be name=value", g_file, no, tok); continue; }
             *eq = 0;
             const char* v = eq + 1;
             if (!_stricmp(tok, "swap")) { t.swap = true; t.to = ParseAnim(v); any = true; }
@@ -164,17 +162,76 @@ static void LoadTweaks()
             else if (!_stricmp(tok, "dy")) { t.dy = (float)atof(v); t.move = true; any = true; }
             else if (!_stricmp(tok, "delay")) { t.delay = (float)atof(v); any = true; }
             else if (!_stricmp(tok, "speed")) { t.speed = (float)atof(v); any = true; }
-            else Log("effects.txt line %d: unknown setting '%s'", no, tok);
+            else Log("%s line %d: unknown setting '%s'", g_file, no, tok);
         }
         if (any) g_tweaks[g_nTweaks++] = t;
     }
     fclose(f);
-    Log("%d effect change(s) and %d shot start point(s) from effects.txt", g_nTweaks, g_nShots);
+    Log("%s: %d effect change(s), %d shot line(s)", g_file, g_nTweaks - before, g_nShots - shotsBefore);
+    return true;
+}
+
+// mods\<folder>\mod.ini says enabled=0
+static bool ModOff(const char* folder)
+{
+    char ini[MAX_PATH];
+    sprintf_s(ini, "%s\\mods\\%s\\mod.ini", GameDir(), folder);
+    return GetPrivateProfileIntA("mod", "enabled", 1, ini) == 0;
+}
+static bool LoadMod(const char* folder)
+{
+    if (!_stricmp(folder, "EffectTweaks") || ModOff(folder)) return false;  // (its own file comes last)
+    char path[MAX_PATH];
+    sprintf_s(path, "%s\\mods\\%s\\effects.txt", GameDir(), folder);
+    sprintf_s(g_file, "%s\\effects.txt", folder);
+    return LoadFile(path);
+}
+
+// Every switched-on mod's effects.txt (mods\<folder>\effects.txt: a mod that needs effect or shot
+// changes ships them), in load order (mods\order.txt, then the rest by name); then this mod's own
+// effects.txt, so the player's own lines win. For the same effect, the last line read wins.
+static void LoadTweaks()
+{
+    g_nTweaks = 0;
+    g_nShots = 0;
+    LoadClassIds();
+    char done[64][64];
+    int nDone = 0, nFiles = 0;
+    char path[MAX_PATH];
+    sprintf_s(path, "%s\\mods\\order.txt", GameDir());
+    FILE* f = nullptr;
+    if (!fopen_s(&f, path, "rb") && f) {
+        char line[256];
+        while (fgets(line, sizeof line, f)) {
+            char* s = line;
+            if ((uint8_t)s[0] == 0xEF && (uint8_t)s[1] == 0xBB && (uint8_t)s[2] == 0xBF) s += 3;
+            s[strcspn(s, "\r\n")] = 0;
+            if (!*s || *s == ';' || *s == '#' || strpbrk(s, "\\/:") || strlen(s) >= 64) continue;
+            if (nDone < 64) strcpy_s(done[nDone++], s);
+            nFiles += LoadMod(s) ? 1 : 0;
+        }
+        fclose(f);
+    }
+    sprintf_s(path, "%s\\mods\\*", GameDir());
+    WIN32_FIND_DATAA fd;
+    HANDLE h = FindFirstFileA(path, &fd);
+    if (h != INVALID_HANDLE_VALUE) {
+        do {
+            if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) || fd.cFileName[0] == '.') continue;
+            bool seen = false;
+            for (int i = 0; i < nDone && !seen; i++) seen = !_stricmp(done[i], fd.cFileName);
+            if (!seen) nFiles += LoadMod(fd.cFileName) ? 1 : 0;
+        } while (FindNextFileA(h, &fd));  // (NTFS lists names in order)
+        FindClose(h);
+    }
+    strcpy_s(g_file, "EffectTweaks\\effects.txt");
+    nFiles += LoadFile(g_path) ? 1 : 0;
+    Log("%d effect change(s) and %d shot line(s) from %d effects.txt file(s)", g_nTweaks, g_nShots, nFiles);
 }
 
 static const Tweak* Find(uint32_t hash)
 {
-    for (int i = 0; i < g_nTweaks; i++)
+    for (int i = g_nTweaks - 1; i >= 0; i--)  // the last line read wins
         if (g_tweaks[i].hash == hash) return &g_tweaks[i];
     return nullptr;
 }
